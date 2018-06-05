@@ -6,13 +6,23 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 
+import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
+
 public final class TcpSocketClient
 {
+
     public static void main(String[] args) throws IOException
     {
         LOG.info("Creating socket ...");
-        final Socket socket = new Socket("localhost", 6789);
-        LOG.info("... created.");
+        final Socket socket = new Socket(TcpCommon.SERVER_HOST, SERVER_PORT);
+        LOG.info("... created, address: {}, port: {}, local address: {}, local port: {}, socket local address: {}, socket remote address: {}",
+                socket.getInetAddress(),
+                socket.getPort(),
+                socket.getLocalAddress(),
+                socket.getLocalPort(),
+                socket.getLocalSocketAddress(),
+                socket.getRemoteSocketAddress()
+        );
 
         final InputStream inputStream = socket.getInputStream();
         final InputStreamReader reader = new InputStreamReader(inputStream);

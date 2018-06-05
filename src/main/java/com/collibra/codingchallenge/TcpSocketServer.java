@@ -7,19 +7,29 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
+
 public final class TcpSocketServer
 {
+
     public static void main(String[] args) throws IOException
     {
         LOG.info("Creating server socket ...");
-        final ServerSocket serverSocket = new ServerSocket(6789);
+        final ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
         LOG.info("... created");
 
         while (true)
         {
-            LOG.info("Accepting ...");
+            LOG.info("Accepting client connection..");
             final Socket socket = serverSocket.accept();
-            LOG.info("... accepted");
+            LOG.info(
+                    "... accepted, address: {}, port: {}, local address: {}, local port: {}",
+                    socket.getInetAddress(),
+                    socket.getPort(),
+                    socket.getLocalAddress(),
+                    socket.getLocalPort()
+            );
+
 
             final InputStream inputStream = socket.getInputStream();
             final InputStreamReader reader = new InputStreamReader(inputStream);
