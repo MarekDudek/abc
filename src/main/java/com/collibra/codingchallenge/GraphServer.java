@@ -13,7 +13,7 @@ import java.net.Socket;
 import java.util.UUID;
 
 import static com.collibra.codingchallenge.TcpCommon.CLIENT_TIMEOUT;
-import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
+import static com.collibra.codingchallenge.TcpCommon.COLLIBRA_PORT;
 
 public final class GraphServer
 {
@@ -25,7 +25,7 @@ public final class GraphServer
 
         try
         {
-            new GraphServer().start(SERVER_PORT, CLIENT_TIMEOUT);
+            new GraphServer().start(COLLIBRA_PORT, CLIENT_TIMEOUT);
 
         } catch (final IOException e)
         {
@@ -45,11 +45,7 @@ public final class GraphServer
             LOGGER.info("Waiting for clients ...");
 
             final Socket client = server.accept();
-
-            LOGGER.info("Client accepted.");
-
             final long started = System.currentTimeMillis();
-            //client.setSoTimeout(timeout);
 
             final ClientHandler handler =
                     ClientHandler.builder().
@@ -79,7 +75,6 @@ public final class GraphServer
                 final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                out.println("costam");
             } catch (final IOException e)
             {
                 LOGGER.error("Client {} on port {} failed", sessionID, socket.getPort());
