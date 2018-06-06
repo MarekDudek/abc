@@ -1,5 +1,6 @@
 # Collibra coding challenge
-This is a standard Maven project. To run build
+
+This is a standard Maven project. In order to run it first build
 
     mvn clean install
     
