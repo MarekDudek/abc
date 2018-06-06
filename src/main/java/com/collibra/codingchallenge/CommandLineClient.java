@@ -16,6 +16,7 @@ public final class CommandLineClient
 
     private void run()
     {
+        err.println("connecting to server...");
         try (
                 final Socket client = new Socket(TcpCommon.SERVER_HOST, TcpCommon.COLLIBRA_PORT);
                 final PrintWriter output = new PrintWriter(client.getOutputStream(), true);

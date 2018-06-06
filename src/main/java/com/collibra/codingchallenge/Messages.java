@@ -34,7 +34,7 @@ final class Messages
 
     private static final Pattern CLIENT_BYE_MESSAGE = Pattern.compile("BYE MATE!", CASE_INSENSITIVE);
 
-    static boolean parseClientBy(final String message)
+    static boolean parseClientBye(final String message)
     {
         final Matcher matcher = CLIENT_BYE_MESSAGE.matcher(message);
         return matcher.matches();
@@ -43,5 +43,9 @@ final class Messages
     static String serverBye(final String name, final long millis)
     {
         return format("BYE %s, WE SPOKE FOR %d MS", name, millis);
+    }
+
+    static String didNotUnderstand() {
+        return "SORRY, I DIDN'T UNDERSTAND THAT";
     }
 }
