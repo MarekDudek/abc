@@ -5,6 +5,7 @@ import lombok.Builder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.UUID;
 
 import static com.collibra.codingchallenge.Messages.clientName;
@@ -39,5 +40,33 @@ final class BasicProtocol
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
         server.println(format("BYE %s, WE SPOKE FOR %d MS", name, duration));
+    }
+
+    Iterable<String> requests()
+    {
+        return () -> new Iterator<String>()
+        {
+            private String request;
+
+            @Override
+            public boolean hasNext()
+            {
+                try
+                {
+                    request = client.readLine();
+                    return !(request == null || request.equals("BYE MATE!"));
+                }
+                catch (final IOException ignored)
+                {
+                    return false;
+                }
+            }
+
+            @Override
+            public String next()
+            {
+                return request;
+            }
+        };
     }
 }

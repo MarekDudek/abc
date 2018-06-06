@@ -92,8 +92,10 @@ public final class GraphServer
 
                 basic.exchangeGreetings();
 
-                for (String r = in.readLine(); r != null && !r.equals("BYE MATE!"); r = in.readLine())
+                for (final String request : basic.requests())
                 {
+                    LOGGER.info(request);
+                    
                     basic.apologise();
                 }
             }
