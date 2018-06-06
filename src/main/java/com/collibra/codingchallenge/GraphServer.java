@@ -94,8 +94,6 @@ public final class GraphServer
 
                 for (final String request : basic.requests())
                 {
-                    LOGGER.info(request);
-
                     basic.apologise();
                 }
             }

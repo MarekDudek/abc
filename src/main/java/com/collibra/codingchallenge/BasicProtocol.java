@@ -1,6 +1,8 @@
 package com.collibra.codingchallenge;
 
 import lombok.Builder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +16,8 @@ import static java.lang.String.format;
 @Builder
 final class BasicProtocol
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicProtocol.class);
+
     private final BufferedReader client;
     private final PrintWriter server;
 
@@ -24,22 +28,35 @@ final class BasicProtocol
 
     void exchangeGreetings() throws IOException
     {
-        server.println(format("HI, I'M %s", sessionID));
-        final String introduction = client.readLine();
-        name = clientName(introduction);
-        server.println(format("HI %s", name));
+        final String serverIntro = format("HI, I'M %s", sessionID);
+        LOGGER.info("server introduction - '{}'", serverIntro);
+        server.println(serverIntro);
+
+        final String clientIntro = client.readLine();
+        LOGGER.info("client introduction - '{}'", clientIntro);
+
+        name = clientName(clientIntro);
+
+        final String greeting = format("HI %s", name);
+        LOGGER.info("server greeting - '{}'", greeting);
+        server.println(greeting);
     }
 
     void apologise()
     {
-        server.println("SORRY, I DIDN'T UNDERSTAND THAT");
+        final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
+        LOGGER.info("apology - '{}'", apology);
+        server.println(apology);
     }
 
     void sayGoodBye()
     {
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
-        server.println(format("BYE %s, WE SPOKE FOR %d MS", name, duration));
+
+        final String goodBye = format("BYE %s, WE SPOKE FOR %d MS", name, duration);
+        LOGGER.info("good bye - '{}'", goodBye);
+        server.println(goodBye);
     }
 
     Iterable<String> requests()
@@ -54,6 +71,7 @@ final class BasicProtocol
                 try
                 {
                     request = client.readLine();
+                    LOGGER.info("request - '{}'", request);
                     return !(request == null || request.equals("BYE MATE!"));
                 }
                 catch (final IOException ignored)
