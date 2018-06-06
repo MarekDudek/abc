@@ -13,10 +13,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.UUID;
 
-import static com.collibra.codingchallenge.Messages.clientName;
 import static com.collibra.codingchallenge.TcpCommon.CLIENT_TIMEOUT;
 import static com.collibra.codingchallenge.TcpCommon.COLLIBRA_PORT;
-import static java.lang.String.format;
 
 public final class GraphServer
 {
@@ -78,24 +76,25 @@ public final class GraphServer
 
             BufferedReader in = null;
             PrintWriter out = null;
+            BasicProtocol basic = null;
 
             try
             {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                out.println(format("HI, I'M %s", sessionID));
+                basic = BasicProtocol.builder().
+                        client(in).
+                        server(out).
+                        sessionID(sessionID).
+                        started(started).
+                        build();
 
-                final String introduction = in.readLine();
-                name = clientName(introduction);
+                basic.exchangeGreetings();
 
-                out.println(format("HI %s", name));
-
-                String request;
-
-                while ((request = in.readLine()) != null && !request.equals("BYE MATE!"))
+                for (String r = in.readLine(); r != null && !r.equals("BYE MATE!"); r = in.readLine())
                 {
-                    out.println("SORRY, I DIDN'T UNDERSTAND THAT");
+                    basic.apologise();
                 }
             }
             catch (final IOException e)
@@ -104,11 +103,9 @@ public final class GraphServer
             }
             finally
             {
-                if (out != null)
+                if (basic != null)
                 {
-                    final long finished = System.currentTimeMillis();
-                    final long duration = finished - started;
-                    out.println(format("BYE %s, WE SPOKE FOR %d MS", name, duration));
+                    basic.sayGoodBye();
                 }
 
                 IOUtils.closeQuietly(in);
