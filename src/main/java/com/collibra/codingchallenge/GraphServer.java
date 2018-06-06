@@ -1,6 +1,7 @@
 package com.collibra.codingchallenge;
 
 import lombok.Builder;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +13,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.UUID;
 
+import static com.collibra.codingchallenge.Messages.clientName;
 import static com.collibra.codingchallenge.TcpCommon.CLIENT_TIMEOUT;
 import static com.collibra.codingchallenge.TcpCommon.COLLIBRA_PORT;
+import static java.lang.String.format;
 
 public final class GraphServer
 {
@@ -26,8 +29,8 @@ public final class GraphServer
         try
         {
             new GraphServer().start(COLLIBRA_PORT, CLIENT_TIMEOUT);
-
-        } catch (final IOException e)
+        }
+        catch (final IOException e)
         {
             LOGGER.error("I/O error: " + e.getMessage());
             System.exit(1);
@@ -46,6 +49,7 @@ public final class GraphServer
 
             final Socket client = server.accept();
             final long started = System.currentTimeMillis();
+            client.setSoTimeout(timeout);
 
             final ClientHandler handler =
                     ClientHandler.builder().
@@ -65,22 +69,53 @@ public final class GraphServer
         private final long started;
         private final UUID sessionID = UUID.randomUUID();
 
+        private String name;
+
         @Override
         public void run()
         {
-            LOGGER.info("Client {} running on port {} started", sessionID, socket.getPort());
+            LOGGER.info("Client {} on {} started", sessionID, socket);
+
+            BufferedReader in = null;
+            PrintWriter out = null;
 
             try
             {
-                final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
 
-            } catch (final IOException e)
+                out.println(format("HI, I'M %s", sessionID));
+
+                final String introduction = in.readLine();
+                name = clientName(introduction);
+
+                out.println(format("HI %s", name));
+
+                String request;
+
+                while ((request = in.readLine()) != null && !request.equals("BYE MATE!"))
+                {
+                    out.println("SORRY, I DIDN'T UNDERSTAND THAT");
+                }
+            }
+            catch (final IOException e)
             {
-                LOGGER.error("Client {} on port {} failed", sessionID, socket.getPort());
+                LOGGER.error("Client {} on {} failed with message '{}'", sessionID, socket, e.getMessage());
+            }
+            finally
+            {
+                if (out != null)
+                {
+                    final long finished = System.currentTimeMillis();
+                    final long duration = finished - started;
+                    out.println(format("BYE %s, WE SPOKE FOR %d MS", name, duration));
+                }
+
+                IOUtils.closeQuietly(in);
+                IOUtils.closeQuietly(out);
             }
 
-            LOGGER.info("Client {} running on port {} finished", sessionID, socket.getPort());
+            LOGGER.info("Client {} on {} finished", sessionID, socket);
         }
     }
 }

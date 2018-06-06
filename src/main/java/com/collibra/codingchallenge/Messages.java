@@ -14,9 +14,9 @@ final class Messages
         return format("HI, I'M %s", uuid);
     }
 
-    private static final Pattern CLIENT_HI_MESSAGE = Pattern.compile("HI, I'M (\\w+)", CASE_INSENSITIVE);
+    private static final Pattern CLIENT_HI_MESSAGE = Pattern.compile("HI, I'M (.+)", CASE_INSENSITIVE);
 
-    static String parseClientHiMessage(final String message)
+    static String clientName(final String message)
     {
         final Matcher matcher = CLIENT_HI_MESSAGE.matcher(message);
 

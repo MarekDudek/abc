@@ -29,7 +29,7 @@ final class PhaseOneProtocol
         if (state == WAITING_FOR_NAME)
         {
             state = WAITING_FOR_BYE;
-            name = Messages.parseClientHiMessage(request);
+            name = Messages.clientName(request);
             if (name != null)
             {
                 return Messages.serverNameHi(name);
