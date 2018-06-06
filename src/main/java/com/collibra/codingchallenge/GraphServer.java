@@ -34,7 +34,7 @@ public final class GraphServer
             System.exit(1);
         }
 
-        LOGGER.info("Collibra Graph Server finished.");
+        LOGGER.info("Collibra Graph Server finished");
     }
 
     private void start(final int port, final int timeout) throws IOException
@@ -95,7 +95,7 @@ public final class GraphServer
                 for (final String request : basic.requests())
                 {
                     LOGGER.info(request);
-                    
+
                     basic.apologise();
                 }
             }
