@@ -6,13 +6,14 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 
-import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
+import static com.collibra.codingchallenge.CollibraConstants.COLLIBRA_PORT;
+import static com.collibra.codingchallenge.CollibraConstants.SERVER_HOST;
 
 public final class TcpSocketClient {
 
     public static void main(String[] args) throws IOException {
         LOG.info("Creating socket ...");
-        final Socket socket = new Socket(TcpCommon.SERVER_HOST, SERVER_PORT);
+        final Socket socket = new Socket(SERVER_HOST, COLLIBRA_PORT);
         LOG.info("... created, address: {}, port: {}, local address: {}, local port: {}, socket local address: {}, socket remote address: {}",
                 socket.getInetAddress(),
                 socket.getPort(),

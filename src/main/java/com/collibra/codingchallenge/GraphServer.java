@@ -10,8 +10,8 @@ import java.net.Socket;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.collibra.codingchallenge.TcpCommon.CLIENT_TIMEOUT;
-import static com.collibra.codingchallenge.TcpCommon.COLLIBRA_PORT;
+import static com.collibra.codingchallenge.CollibraConstants.CLIENT_TIMEOUT;
+import static com.collibra.codingchallenge.CollibraConstants.COLLIBRA_PORT;
 
 public final class GraphServer {
 

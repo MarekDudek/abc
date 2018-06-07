@@ -61,7 +61,15 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+    
     <dependencies>
+        <!-- general -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -71,6 +79,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
+        </dependency>
+        <!-- graphs -->
+        <dependency>
+            <groupId>com.github.Erdos-Graph-Framework</groupId>
+            <artifactId>Erdos</artifactId>
+            <version>v1.0</version>
         </dependency>
         <!-- logging -->
         <dependency>

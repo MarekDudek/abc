@@ -7,13 +7,11 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
-
 public final class TcpSocketServer {
 
     public static void main(String[] args) throws IOException {
         LOG.info("Creating server socket ...");
-        final ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
+        final ServerSocket serverSocket = new ServerSocket(CollibraConstants.COLLIBRA_PORT);
         LOG.info("... created");
 
         while (true) {
