@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public final class MessagesTest {
+
     @Test
     public void client_hi() {
         // when

@@ -1,31 +1,49 @@
 package com.collibra.codingchallenge;
 
-import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Iterator;
 import java.util.UUID;
 
 import static com.collibra.codingchallenge.Messages.clientName;
 import static java.lang.String.format;
 
-@Builder
-final class Protocol {
+@RequiredArgsConstructor
+final class Protocol implements AutoCloseable {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
-    private final BufferedReader client;
-    private final PrintWriter server;
-
+    private final Socket socket;
     private final UUID sessionID;
     private final long started;
 
+    private BufferedReader client;
+    private PrintWriter server;
+
     private String name;
 
+    Protocol initialized() throws IOException {
+        client = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        server = new PrintWriter(socket.getOutputStream(), true);
+        return this;
+    }
+
+    @Override
+    public void close() {
+        IOUtils.closeQuietly(client);
+        IOUtils.closeQuietly(server);
+    }
+
     void exchangeGreetings() throws IOException {
+
         final String serverIntro = format("HI, I'M %s", sessionID);
         LOGGER.info("server introduction - '{}'", serverIntro);
         server.println(serverIntro);
@@ -41,12 +59,14 @@ final class Protocol {
     }
 
     void apologise() {
+
         final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
         LOGGER.info("apology - '{}'", apology);
         server.println(apology);
     }
 
     void sayGoodBye() {
+
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
 
@@ -56,7 +76,9 @@ final class Protocol {
     }
 
     Iterable<String> requests() {
+
         return () -> new Iterator<String>() {
+
             private String request;
 
             @Override
@@ -76,4 +98,5 @@ final class Protocol {
             }
         };
     }
+
 }

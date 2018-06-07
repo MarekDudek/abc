@@ -11,11 +11,9 @@ final class Messages {
 
     static String clientName(final String message) {
         final Matcher matcher = CLIENT_HI_MESSAGE.matcher(message);
-
         if (matcher.matches()) {
             return matcher.group(1);
         }
-
         return null;
     }
 }
