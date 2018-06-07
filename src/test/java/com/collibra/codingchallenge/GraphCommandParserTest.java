@@ -1,7 +1,6 @@
 package com.collibra.codingchallenge;
 
-import com.collibra.codingchallenge.commands.AddEdge;
-import com.collibra.codingchallenge.commands.AddNode;
+import com.collibra.codingchallenge.commands.*;
 import org.junit.Test;
 
 import java.util.Optional;
@@ -15,10 +14,10 @@ public final class GraphCommandParserTest {
     @Test
     public void add_node() {
         // when
-        final Optional<GraphCommand> command = GraphCommandParser.parse("ADD NODE sth");
+        final Optional<GraphCommand> command = GraphCommandParser.parse("ADD NODE node");
         // then
         assertTrue(command.isPresent());
-        assertThat(command.get(), is(new AddNode("sth")));
+        assertThat(command.get(), is(new AddNode("node")));
     }
 
     @Test
@@ -28,5 +27,41 @@ public final class GraphCommandParserTest {
         // then
         assertTrue(command.isPresent());
         assertThat(command.get(), is(new AddEdge("from", "to", 23)));
+    }
+
+    @Test
+    public void remove_node() {
+        // when
+        final Optional<GraphCommand> command = GraphCommandParser.parse("REMOVE NODE node");
+        // then
+        assertTrue(command.isPresent());
+        assertThat(command.get(), is(new RemoveNode("node")));
+    }
+
+    @Test
+    public void remove_edge() {
+        // when
+        final Optional<GraphCommand> command = GraphCommandParser.parse("REMOVE EDGE from to");
+        // then
+        assertTrue(command.isPresent());
+        assertThat(command.get(), is(new RemoveEdge("from", "to")));
+    }
+
+    @Test
+    public void shortest_path() {
+        // when
+        final Optional<GraphCommand> command = GraphCommandParser.parse("SHORTEST PATH from to");
+        // then
+        assertTrue(command.isPresent());
+        assertThat(command.get(), is(new ShortestPath("from", "to")));
+    }
+
+    @Test
+    public void closer_than() {
+        // when
+        final Optional<GraphCommand> command = GraphCommandParser.parse("CLOSER THAN 23 node");
+        // then
+        assertTrue(command.isPresent());
+        assertThat(command.get(), is(new CloserThan(23, "node")));
     }
 }

@@ -2,9 +2,14 @@ package com.collibra.codingchallenge.commands;
 
 import com.collibra.codingchallenge.GraphCommand;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-@Builder
-class ShortestPath implements GraphCommand {
+@RequiredArgsConstructor
+@EqualsAndHashCode
+@ToString
+public class ShortestPath implements GraphCommand {
     private final String fromNode;
     private final String toNode;
 }

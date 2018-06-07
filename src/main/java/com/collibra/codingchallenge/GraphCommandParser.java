@@ -1,7 +1,6 @@
 package com.collibra.codingchallenge;
 
-import com.collibra.codingchallenge.commands.AddEdge;
-import com.collibra.codingchallenge.commands.AddNode;
+import com.collibra.codingchallenge.commands.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,19 +18,25 @@ final class GraphCommandParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphCommandParser.class);
 
-    private static final Pattern REMOVE_NODE = Pattern.compile("REMOVE NODE (.*)");
-    private static final Pattern EDGE_EDGE = Pattern.compile("REMOVE EDGE (.*) (.*)");
+    static Optional<GraphCommand> parse(final String request) {
+        final BiFunction<Optional<GraphCommand>, Parser, Optional<GraphCommand>> first =
+                (command, parser) ->
+                        command.isPresent()
+                                ? command
+                                : parser.parseAndLog(request);
+        return Stream.of(Parser.values()).reduce(empty(), first, CONST);
+    }
 
-    private static final Pattern SHORTEST_PATH = Pattern.compile("SHORTEST PATH (.*) (.*)");
-    private static final Pattern CLOSER_THAN = Pattern.compile("CLOSER THAN (.*) (.*)");
+    private static final BinaryOperator<Optional<GraphCommand>> CONST = (a, b) -> a;
 
-    private enum Producer {
+
+    private enum Parser {
 
         ADD_NODE(
                 Pattern.compile("ADD NODE (.*)")
         ) {
             @Override
-            Optional<GraphCommand> produce(final String text) {
+            Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String node = matcher.group(1);
@@ -46,14 +51,78 @@ final class GraphCommandParser {
                 Pattern.compile("ADD EDGE (.*) (.*) (.*)")
         ) {
             @Override
-            Optional<GraphCommand> produce(String text) {
+            Optional<GraphCommand> parse(String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String node1 = matcher.group(1);
                     final String node2 = matcher.group(2);
-                    final String s = matcher.group(3);
-                    final int weight = Integer.parseInt(s);
+                    final String str = matcher.group(3);
+                    final int weight = Integer.parseInt(str);
                     final GraphCommand command = new AddEdge(node1, node2, weight);
+                    return of(command);
+                }
+                return empty();
+            }
+        },
+
+        REMOVE_NODE(
+                Pattern.compile("REMOVE NODE (.*)")
+        ) {
+            @Override
+            Optional<GraphCommand> parse(String text) {
+                final Matcher matcher = pattern.matcher(text);
+                if (matcher.matches()) {
+                    final String node = matcher.group(1);
+                    final GraphCommand command = new RemoveNode(node);
+                    return of(command);
+                }
+                return empty();
+            }
+        },
+
+        REMOVE_EDGE(
+                Pattern.compile("REMOVE EDGE (.*) (.*)")
+        ) {
+            @Override
+            Optional<GraphCommand> parse(String text) {
+                final Matcher matcher = pattern.matcher(text);
+                if (matcher.matches()) {
+                    final String node1 = matcher.group(1);
+                    final String node2 = matcher.group(2);
+                    final GraphCommand command = new RemoveEdge(node1, node2);
+                    return of(command);
+                }
+                return empty();
+            }
+        },
+
+        SHORTEST_PATH(
+                Pattern.compile("SHORTEST PATH (.*) (.*)")
+        ) {
+            @Override
+            Optional<GraphCommand> parse(String text) {
+                final Matcher matcher = pattern.matcher(text);
+                if (matcher.matches()) {
+                    final String node1 = matcher.group(1);
+                    final String node2 = matcher.group(2);
+                    final GraphCommand command = new ShortestPath(node1, node2);
+                    return of(command);
+                }
+                return empty();
+            }
+        },
+
+        CLOSER_THAN(
+                Pattern.compile("CLOSER THAN (.*) (.*)")
+        ) {
+            @Override
+            Optional<GraphCommand> parse(String text) {
+                final Matcher matcher = pattern.matcher(text);
+                if (matcher.matches()) {
+                    final String str = matcher.group(1);
+                    final int weight = Integer.parseInt(str);
+                    final String node = matcher.group(2);
+                    final GraphCommand command = new CloserThan(weight, node);
                     return of(command);
                 }
                 return empty();
@@ -62,34 +131,20 @@ final class GraphCommandParser {
 
         final Pattern pattern;
 
-        Producer(final Pattern pattern) {
+        Parser(final Pattern pattern) {
             this.pattern = pattern;
         }
 
-        abstract Optional<GraphCommand> produce(final String text);
+        abstract Optional<GraphCommand> parse(final String text);
 
-        Optional<GraphCommand> produceAndLog(final String text) {
+        Optional<GraphCommand> parseAndLog(final String text) {
             LOGGER.info("parsing " + name());
-            final Optional<GraphCommand> command = produce(text);
+            final Optional<GraphCommand> command = parse(text);
             command.ifPresent(
                     c -> LOGGER.info("{}", c)
             );
             return command;
         }
-    }
-
-    static Optional<GraphCommand> parse(final String request) {
-
-        final BiFunction<Optional<GraphCommand>, Producer, Optional<GraphCommand>> accumulator =
-                (command, producer) ->
-                        command.isPresent()
-                                ? command
-                                : producer.produceAndLog(request);
-
-        final BinaryOperator<Optional<GraphCommand>> combiner =
-                (command, ignore) -> command;
-
-        return Stream.of(Producer.values()).reduce(empty(), accumulator, combiner);
     }
 }
 
