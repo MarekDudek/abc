@@ -8,11 +8,9 @@ import java.net.Socket;
 
 import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
 
-public final class TcpSocketClient
-{
+public final class TcpSocketClient {
 
-    public static void main(String[] args) throws IOException
-    {
+    public static void main(String[] args) throws IOException {
         LOG.info("Creating socket ...");
         final Socket socket = new Socket(TcpCommon.SERVER_HOST, SERVER_PORT);
         LOG.info("... created, address: {}, port: {}, local address: {}, local port: {}, socket local address: {}, socket remote address: {}",

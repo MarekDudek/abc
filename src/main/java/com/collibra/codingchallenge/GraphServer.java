@@ -11,25 +11,22 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.collibra.codingchallenge.TcpCommon.CLIENT_TIMEOUT;
 import static com.collibra.codingchallenge.TcpCommon.COLLIBRA_PORT;
 
-public final class GraphServer
-{
+public final class GraphServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
 
-    public static void main(final String[] ignored)
-    {
+    public static void main(final String[] ignored) {
+
         LOGGER.info("Starting Collibra Graph Server");
 
-        try
-        {
+        try {
             new GraphServer().start(COLLIBRA_PORT, CLIENT_TIMEOUT);
-        }
-        catch (final IOException e)
-        {
+        } catch (final IOException e) {
             LOGGER.error("I/O error: " + e.getMessage());
             System.exit(1);
         }
@@ -37,23 +34,19 @@ public final class GraphServer
         LOGGER.info("Collibra Graph Server finished");
     }
 
-    private void start(final int port, final int timeout) throws IOException
-    {
+    private void start(final int port, final int timeout) throws IOException {
+
         final ServerSocket server = new ServerSocket(port);
 
-        while (true)
-        {
+        while (true) {
+
             LOGGER.info("Waiting for clients ...");
 
             final Socket client = server.accept();
             final long started = System.currentTimeMillis();
             client.setSoTimeout(timeout);
 
-            final ClientHandler handler =
-                    ClientHandler.builder().
-                            socket(client).
-                            started(started).
-                            build();
+            final ClientHandler handler = ClientHandler.builder().socket(client).started(started).build();
 
             final Thread thread = new Thread(handler);
             thread.start();
@@ -61,8 +54,8 @@ public final class GraphServer
     }
 
     @Builder
-    private static class ClientHandler implements Runnable
-    {
+    private static class ClientHandler implements Runnable {
+
         private final Socket socket;
         private final long started;
         private final UUID sessionID = UUID.randomUUID();
@@ -70,42 +63,39 @@ public final class GraphServer
         private String name;
 
         @Override
-        public void run()
-        {
+        public void run() {
+
             LOGGER.info("Client {} on {} started", sessionID, socket);
 
             BufferedReader in = null;
             PrintWriter out = null;
-            BasicProtocol basic = null;
+            Protocol protocol = null;
 
-            try
-            {
+            try {
+
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                basic = BasicProtocol.builder().
-                        client(in).
-                        server(out).
-                        sessionID(sessionID).
-                        started(started).
-                        build();
+                protocol = Protocol.builder().client(in).server(out).sessionID(sessionID).started(started).build();
 
-                basic.exchangeGreetings();
+                protocol.exchangeGreetings();
 
-                for (final String request : basic.requests())
-                {
-                    basic.apologise();
+                for (final String request : protocol.requests()) {
+
+                    final Optional<GraphCommand> command = GraphCommandParser.parse(request);
+                    if (command.isPresent()) {
+
+                    } else {
+                        protocol.apologise();
+                    }
                 }
-            }
-            catch (final IOException e)
-            {
+
+            } catch (final IOException e) {
                 LOGGER.error("Client {} on {} failed with message '{}'", sessionID, socket, e.getMessage());
-            }
-            finally
-            {
-                if (basic != null)
-                {
-                    basic.sayGoodBye();
+            } finally {
+
+                if (protocol != null) {
+                    protocol.sayGoodBye();
                 }
 
                 IOUtils.closeQuietly(in);

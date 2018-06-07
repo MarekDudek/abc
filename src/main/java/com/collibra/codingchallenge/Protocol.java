@@ -14,9 +14,8 @@ import static com.collibra.codingchallenge.Messages.clientName;
 import static java.lang.String.format;
 
 @Builder
-final class BasicProtocol
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasicProtocol.class);
+final class Protocol {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
     private final BufferedReader client;
     private final PrintWriter server;
@@ -26,8 +25,7 @@ final class BasicProtocol
 
     private String name;
 
-    void exchangeGreetings() throws IOException
-    {
+    void exchangeGreetings() throws IOException {
         final String serverIntro = format("HI, I'M %s", sessionID);
         LOGGER.info("server introduction - '{}'", serverIntro);
         server.println(serverIntro);
@@ -42,15 +40,13 @@ final class BasicProtocol
         server.println(greeting);
     }
 
-    void apologise()
-    {
+    void apologise() {
         final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
         LOGGER.info("apology - '{}'", apology);
         server.println(apology);
     }
 
-    void sayGoodBye()
-    {
+    void sayGoodBye() {
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
 
@@ -59,30 +55,23 @@ final class BasicProtocol
         server.println(goodBye);
     }
 
-    Iterable<String> requests()
-    {
-        return () -> new Iterator<String>()
-        {
+    Iterable<String> requests() {
+        return () -> new Iterator<String>() {
             private String request;
 
             @Override
-            public boolean hasNext()
-            {
-                try
-                {
+            public boolean hasNext() {
+                try {
                     request = client.readLine();
                     LOGGER.info("request - '{}'", request);
                     return !(request == null || request.equals("BYE MATE!"));
-                }
-                catch (final IOException ignored)
-                {
+                } catch (final IOException ignored) {
                     return false;
                 }
             }
 
             @Override
-            public String next()
-            {
+            public String next() {
                 return request;
             }
         };

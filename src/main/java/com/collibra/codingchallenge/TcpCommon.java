@@ -1,7 +1,6 @@
 package com.collibra.codingchallenge;
 
-final class TcpCommon
-{
+final class TcpCommon {
     static final String SERVER_HOST = "localhost";
     static final int SERVER_PORT = 6789;
 

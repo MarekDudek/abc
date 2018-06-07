@@ -9,17 +9,14 @@ import java.net.Socket;
 
 import static com.collibra.codingchallenge.TcpCommon.SERVER_PORT;
 
-public final class TcpSocketServer
-{
+public final class TcpSocketServer {
 
-    public static void main(String[] args) throws IOException
-    {
+    public static void main(String[] args) throws IOException {
         LOG.info("Creating server socket ...");
         final ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
         LOG.info("... created");
 
-        while (true)
-        {
+        while (true) {
             LOG.info("Accepting client connection..");
             final Socket socket = serverSocket.accept();
             LOG.info(
