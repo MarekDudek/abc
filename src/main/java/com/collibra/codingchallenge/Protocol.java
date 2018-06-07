@@ -42,7 +42,7 @@ final class Protocol implements AutoCloseable {
         IOUtils.closeQuietly(server);
     }
 
-    void exchangeGreetings() throws IOException {
+    void greetEachOther() throws IOException {
 
         final String serverIntro = format("HI, I'M %s", sessionID);
         LOGGER.info("server introduction - '{}'", serverIntro);
@@ -58,13 +58,6 @@ final class Protocol implements AutoCloseable {
         server.println(greeting);
     }
 
-    void apologise() {
-
-        final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
-        LOGGER.info("apology - '{}'", apology);
-        server.println(apology);
-    }
-
     void sayGoodBye() {
 
         final long finished = System.currentTimeMillis();
@@ -73,6 +66,13 @@ final class Protocol implements AutoCloseable {
         final String goodBye = format("BYE %s, WE SPOKE FOR %d MS", name, duration);
         LOGGER.info("good bye - '{}'", goodBye);
         server.println(goodBye);
+    }
+
+    void apologise() {
+
+        final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
+        LOGGER.info("apology - '{}'", apology);
+        server.println(apology);
     }
 
     Iterable<String> requests() {

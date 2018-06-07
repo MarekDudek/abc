@@ -53,7 +53,7 @@ public final class GraphServer {
             Protocol protocol = null;
             try {
                 protocol = new Protocol(socket, sessionID, started).initialized();
-                protocol.exchangeGreetings();
+                protocol.greetEachOther();
                 for (final String request : protocol.requests()) {
                     final Optional<GraphCommand> command = GraphCommandParser.parse(request);
                     if (command.isPresent()) {

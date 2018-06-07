@@ -38,7 +38,6 @@ final class GraphCommandParser {
         ADD_NODE(
                 Pattern.compile("ADD NODE (.*)")
         ) {
-            @Override
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
@@ -53,8 +52,7 @@ final class GraphCommandParser {
         ADD_EDGE(
                 Pattern.compile("ADD EDGE (.*) (.*) (.*)")
         ) {
-            @Override
-            Optional<GraphCommand> parse(String text) {
+            Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String node1 = matcher.group(1);
@@ -71,8 +69,7 @@ final class GraphCommandParser {
         REMOVE_NODE(
                 Pattern.compile("REMOVE NODE (.*)")
         ) {
-            @Override
-            Optional<GraphCommand> parse(String text) {
+            Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String node = matcher.group(1);
@@ -86,8 +83,7 @@ final class GraphCommandParser {
         REMOVE_EDGE(
                 Pattern.compile("REMOVE EDGE (.*) (.*)")
         ) {
-            @Override
-            Optional<GraphCommand> parse(String text) {
+            Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String node1 = matcher.group(1);
@@ -102,8 +98,7 @@ final class GraphCommandParser {
         SHORTEST_PATH(
                 Pattern.compile("SHORTEST PATH (.*) (.*)")
         ) {
-            @Override
-            Optional<GraphCommand> parse(String text) {
+            Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String node1 = matcher.group(1);
@@ -118,8 +113,7 @@ final class GraphCommandParser {
         CLOSER_THAN(
                 Pattern.compile("CLOSER THAN (.*) (.*)")
         ) {
-            @Override
-            Optional<GraphCommand> parse(String text) {
+            Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
                     final String str = matcher.group(1);
@@ -135,7 +129,7 @@ final class GraphCommandParser {
         final Pattern pattern;
 
 
-        abstract Optional<GraphCommand> parse(final String text);
+        abstract Optional<GraphCommand> parse(String text);
 
         Optional<GraphCommand> parseAndLog(final String text) {
             LOGGER.info("parsing " + name());
@@ -147,4 +141,3 @@ final class GraphCommandParser {
         }
     }
 }
-
