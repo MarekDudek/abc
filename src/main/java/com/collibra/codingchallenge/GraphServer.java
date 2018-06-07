@@ -62,7 +62,6 @@ public final class GraphServer {
                         protocol.apologise();
                     }
                 }
-
             } catch (final IOException e) {
                 LOGGER.error("Client {} on {} failed with message '{}'", sessionID, socket, e.getMessage());
             } finally {

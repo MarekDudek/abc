@@ -1,6 +1,7 @@
 package com.collibra.codingchallenge;
 
 import com.collibra.codingchallenge.commands.*;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ final class GraphCommandParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphCommandParser.class);
 
+
     static Optional<GraphCommand> parse(final String request) {
         final BiFunction<Optional<GraphCommand>, Parser, Optional<GraphCommand>> first =
                 (command, parser) ->
@@ -30,6 +32,7 @@ final class GraphCommandParser {
     private static final BinaryOperator<Optional<GraphCommand>> CONST = (a, b) -> a;
 
 
+    @AllArgsConstructor
     private enum Parser {
 
         ADD_NODE(
@@ -131,9 +134,6 @@ final class GraphCommandParser {
 
         final Pattern pattern;
 
-        Parser(final Pattern pattern) {
-            this.pattern = pattern;
-        }
 
         abstract Optional<GraphCommand> parse(final String text);
 
