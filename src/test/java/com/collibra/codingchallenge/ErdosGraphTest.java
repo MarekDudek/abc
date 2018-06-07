@@ -2,7 +2,6 @@ package com.collibra.codingchallenge;
 
 import com.hendrix.erdos.graphs.AbstractGraph;
 import com.hendrix.erdos.graphs.SimpleDirectedGraph;
-import com.hendrix.erdos.interfaces.IData;
 import com.hendrix.erdos.types.Edge;
 import com.hendrix.erdos.types.IVertex;
 import com.hendrix.erdos.types.Vertex;
@@ -13,8 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.hendrix.erdos.types.Edge.EDGE_DIRECTION.DIRECTED;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public final class ErdosGraphTest {
 
@@ -24,35 +23,63 @@ public final class ErdosGraphTest {
         return vertex;
     }
 
-    private static Optional<IVertex> find(final AbstractGraph graph, final IData query) {
-        for (final IVertex vertex : graph.vertices())
-            if (Objects.equals(vertex.getData(), query.getData()))
+    private static Optional<IVertex> find(final AbstractGraph graph, final IVertex query) {
+        for (final IVertex vertex : graph.vertices()) {
+            if (Objects.equals(vertex.getData(), query.getData())) {
                 return Optional.of(vertex);
+            }
+        }
         return Optional.empty();
     }
 
-    private static boolean exists(final AbstractGraph graph, final IData query) {
+    private static boolean exists(final AbstractGraph graph, final IVertex query) {
         return find(graph, query).isPresent();
     }
 
-    private static void removeVertex(final AbstractGraph graph, final IData query) {
-        find(graph, query).ifPresent(graph::removeVertex);
+    private static boolean addVertex(final AbstractGraph graph, final IVertex vertex) {
+        return find(graph, vertex).map(
+                found -> false
+        ).orElseGet(
+                () -> {
+                    graph.addVertex(vertex);
+                    return true;
+                }
+        );
+    }
+
+    private static boolean removeVertex(final AbstractGraph graph, final IVertex query) {
+        return find(graph, query).map(
+                graph::removeVertex
+        ).orElse(
+                false
+        );
     }
 
     @Test
     public void add_node() {
+        // given
+        final String id = "node";
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
         // then
-        assertFalse(exists(graph, vertex("node")));
+        assertThat(exists(graph, vertex(id)), is(false));
         // when
-        graph.addVertex(vertex("node"));
+        final boolean added = addVertex(graph, vertex(id));
         // then
-        assertTrue(exists(graph, vertex("node")));
+        assertThat(added, is(true));
+        assertThat(exists(graph, vertex(id)), is(true));
         // when
-        removeVertex(graph, vertex("node"));
+        final boolean addedAgain = addVertex(graph, vertex(id));
+        assertThat(addedAgain, is(false));
+        // when
+        final boolean removed = removeVertex(graph, vertex(id));
         // then
-        assertFalse(exists(graph, vertex("node")));
+        assertThat(removed, is(true));
+        assertThat(exists(graph, vertex(id)), is(false));
+        // when
+        final boolean removedAgain = removeVertex(graph, vertex(id));
+        // then
+        assertThat(removedAgain, is(false));
     }
 
     @Test
