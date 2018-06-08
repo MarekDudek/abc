@@ -89,9 +89,12 @@ public final class ErdosGraphTest {
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
         // then
-        assertThat(exists(graph, edge(vertex(from), vertex(to), weight)), is(false));
-        assertThat(exists(graph, edge(vertex(from), vertex(to))), is(false));
-
+        assertThat(exists(graph, vertex(from), vertex(to), weight), is(false));
+        assertThat(exists(graph, vertex(from), vertex(to)), is(false));
+        // when
+        final boolean added = addEdge(graph, vertex(from), vertex(to), weight);
+        // then
+        assertThat(added, is(false));
 
     }
 
@@ -106,13 +109,50 @@ public final class ErdosGraphTest {
     private static Optional<IVertex> find
             (
                     final AbstractGraph graph,
-                    final Edge query
+                    final IVertex<String> from,
+                    final IVertex<String> to
             ) {
 
         return Optional.empty();
     }
 
-    private static boolean exists(final AbstractGraph graph, final Edge query) {
-        return find(graph, query).isPresent();
+    private static Optional<IVertex> find
+            (
+                    final AbstractGraph graph,
+                    final IVertex<String> from,
+                    final IVertex<String> to,
+                    int weight
+            ) {
+
+        return Optional.empty();
+    }
+
+    private Boolean exists
+            (
+                    final SimpleDirectedGraph graph,
+                    final IVertex<String> from,
+                    final IVertex<String> to,
+                    int weight
+            ) {
+        return find(graph, from, to, weight).isPresent();
+    }
+
+    private Boolean exists
+            (
+                    final SimpleDirectedGraph graph,
+                    final IVertex<String> from,
+                    final IVertex<String> to
+            ) {
+        return find(graph, from, to).isPresent();
+    }
+
+    private static boolean addEdge
+            (
+                    final SimpleDirectedGraph graph,
+                    final IVertex<String> from,
+                    final IVertex<String> to,
+                    final int weight
+            ) {
+        return false;
     }
 }
