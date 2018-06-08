@@ -12,9 +12,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static com.collibra.codingchallenge.Messages.clientName;
 import static java.lang.String.format;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 @RequiredArgsConstructor
 final class Protocol implements AutoCloseable {
@@ -99,4 +101,13 @@ final class Protocol implements AutoCloseable {
         };
     }
 
+    private static final Pattern INTRODUCTION = Pattern.compile("HI, I'M (.+)", CASE_INSENSITIVE);
+
+    static String clientName(final String introduction) {
+        final Matcher matcher = INTRODUCTION.matcher(introduction);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
 }

@@ -56,7 +56,7 @@ public final class ErdosGraphTest {
     }
 
     @Test
-    public void add_node() {
+    public void adding_and_removing_nodes() {
         // given
         final String id = "node";
         // when
