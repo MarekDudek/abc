@@ -9,11 +9,15 @@ import org.junit.Test;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public final class ErdosGraphTest {
+
+    private static final BiPredicate<IVertex, IVertex> EQUALS =
+            (a, b) -> Objects.equals(a.getData(), b.getData());
 
     private static IVertex<String> vertex(final String id) {
         final IVertex<String> vertex = new Vertex<>();
@@ -21,21 +25,30 @@ public final class ErdosGraphTest {
         return vertex;
     }
 
-    private static Optional<IVertex> find(final AbstractGraph graph, final IVertex query) {
+    private static Optional<IVertex> findVertex(final AbstractGraph graph, final IVertex query) {
         for (final IVertex vertex : graph.vertices()) {
-            if (Objects.equals(vertex.getData(), query.getData())) {
+            if (EQUALS.test(query, vertex)) {
                 return Optional.of(vertex);
             }
         }
         return Optional.empty();
     }
 
-    private static boolean exists(final AbstractGraph graph, final IVertex query) {
-        return find(graph, query).isPresent();
+    private static Optional<IVertex> findVertex(final AbstractGraph graph, final String query) {
+        for (final IVertex vertex : graph.vertices()) {
+            if (Objects.equals(query, vertex.getData())) {
+                return Optional.of(vertex);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean vertexExists(final AbstractGraph graph, final IVertex query) {
+        return findVertex(graph, query).isPresent();
     }
 
     private static boolean addVertex(final AbstractGraph graph, final IVertex vertex) {
-        return find(graph, vertex).map(
+        return findVertex(graph, vertex).map(
                 found -> false
         ).orElseGet(
                 () -> {
@@ -46,7 +59,7 @@ public final class ErdosGraphTest {
     }
 
     private static boolean removeVertex(final AbstractGraph graph, final IVertex query) {
-        return find(graph, query).map(
+        return findVertex(graph, query).map(
                 graph::removeVertex
         ).orElse(
                 false
@@ -60,12 +73,12 @@ public final class ErdosGraphTest {
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
         // then
-        assertThat(exists(graph, vertex(id)), is(false));
+        assertThat(vertexExists(graph, vertex(id)), is(false));
         // when
         final boolean added = addVertex(graph, vertex(id));
         // then
         assertThat(added, is(true));
-        assertThat(exists(graph, vertex(id)), is(true));
+        assertThat(vertexExists(graph, vertex(id)), is(true));
         // when
         final boolean addedAgain = addVertex(graph, vertex(id));
         assertThat(addedAgain, is(false));
@@ -73,7 +86,7 @@ public final class ErdosGraphTest {
         final boolean removed = removeVertex(graph, vertex(id));
         // then
         assertThat(removed, is(true));
-        assertThat(exists(graph, vertex(id)), is(false));
+        assertThat(vertexExists(graph, vertex(id)), is(false));
         // when
         final boolean removedAgain = removeVertex(graph, vertex(id));
         // then
@@ -89,61 +102,45 @@ public final class ErdosGraphTest {
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
         // then
-        assertThat(exists(graph, vertex(from), vertex(to), weight), is(false));
         assertThat(exists(graph, vertex(from), vertex(to)), is(false));
         // when
+        addVertex(graph, vertex(from));
+        addVertex(graph, vertex(to));
         final boolean added = addEdge(graph, vertex(from), vertex(to), weight);
         // then
-        assertThat(added, is(false));
-
+        assertThat(added, is(true));
+        assertThat(exists(graph, vertex(from), vertex(to)), is(true));
+        // when
+        final boolean addedAgain = addEdge(graph, vertex(from), vertex(to), weight);
+        assertThat(addedAgain, is(false));
     }
 
-    private Edge edge(IVertex<String> from, IVertex<String> to, int weight) {
-        return null;
-    }
-
-    private Edge edge(final IVertex<String> from, final IVertex<String> to) {
-        return null;
-    }
-
-    private static Optional<IVertex> find
+    private static Optional<Edge> findEdge
             (
                     final AbstractGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to
+                    final IVertex fromQuery,
+                    final IVertex toQuery
             ) {
+        for (final Edge edge : graph.edges()) {
+            final IVertex from = edge.getV1();
+            final IVertex to = edge.getV2();
+            final boolean f = EQUALS.test(from, fromQuery);
+            final boolean t = EQUALS.test(to, toQuery);
+            if (f && t) {
+                return Optional.of(edge);
+            }
 
+        }
         return Optional.empty();
     }
 
-    private static Optional<IVertex> find
-            (
-                    final AbstractGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to,
-                    int weight
-            ) {
-
-        return Optional.empty();
-    }
-
-    private Boolean exists
-            (
-                    final SimpleDirectedGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to,
-                    int weight
-            ) {
-        return find(graph, from, to, weight).isPresent();
-    }
-
-    private Boolean exists
+    private boolean exists
             (
                     final SimpleDirectedGraph graph,
                     final IVertex<String> from,
                     final IVertex<String> to
             ) {
-        return find(graph, from, to).isPresent();
+        return findEdge(graph, from, to).isPresent();
     }
 
     private static boolean addEdge
@@ -153,6 +150,15 @@ public final class ErdosGraphTest {
                     final IVertex<String> to,
                     final int weight
             ) {
+        final Optional<IVertex> f = findVertex(graph, from);
+        final Optional<IVertex> t = findVertex(graph, to);
+        if (f.isPresent() && t.isPresent()) {
+            final Optional<Edge> edge = findEdge(graph, f.get(), t.get());
+            if (!edge.isPresent()) {
+                graph.addEdge(f.get(), t.get(), weight);
+                return true;
+            }
+        }
         return false;
     }
 }
