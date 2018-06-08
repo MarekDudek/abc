@@ -102,14 +102,16 @@ public final class ErdosGraphTest {
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
         // then
-        assertThat(exists(graph, vertex(from), vertex(to)), is(false));
+        assertThat(edgeExists(graph, vertex(from), vertex(to)), is(false));
+        assertThat(edgeExists(graph, vertex(from), vertex(to), weight), is(false));
         // when
         addVertex(graph, vertex(from));
         addVertex(graph, vertex(to));
         final boolean added = addEdge(graph, vertex(from), vertex(to), weight);
         // then
         assertThat(added, is(true));
-        assertThat(exists(graph, vertex(from), vertex(to)), is(true));
+        assertThat(edgeExists(graph, vertex(from), vertex(to)), is(true));
+        assertThat(edgeExists(graph, vertex(from), vertex(to), weight), is(true));
         // when
         final boolean addedAgain = addEdge(graph, vertex(from), vertex(to), weight);
         assertThat(addedAgain, is(false));
@@ -118,29 +120,55 @@ public final class ErdosGraphTest {
     private static Optional<Edge> findEdge
             (
                     final AbstractGraph graph,
-                    final IVertex fromQuery,
-                    final IVertex toQuery
+                    final IVertex from,
+                    final IVertex to
             ) {
-        for (final Edge edge : graph.edges()) {
-            final IVertex from = edge.getV1();
-            final IVertex to = edge.getV2();
-            final boolean f = EQUALS.test(from, fromQuery);
-            final boolean t = EQUALS.test(to, toQuery);
+        for (final Edge e : graph.edges()) {
+            final boolean f = EQUALS.test(e.getV1(), from);
+            final boolean t = EQUALS.test(e.getV2(), to);
             if (f && t) {
-                return Optional.of(edge);
+                return Optional.of(e);
             }
 
         }
         return Optional.empty();
     }
 
-    private boolean exists
+    private static Optional<Edge> findEdge
+            (
+                    final AbstractGraph graph,
+                    final IVertex from,
+                    final IVertex to,
+                    final int weight
+            ) {
+        for (final Edge e : graph.edges()) {
+            final boolean f = EQUALS.test(e.getV1(), from);
+            final boolean t = EQUALS.test(e.getV2(), to);
+            final boolean w = e.getWeight() == weight;
+            if (f && t && w) {
+                return Optional.of(e);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private boolean edgeExists
             (
                     final SimpleDirectedGraph graph,
                     final IVertex<String> from,
                     final IVertex<String> to
             ) {
         return findEdge(graph, from, to).isPresent();
+    }
+
+    private Boolean edgeExists
+            (
+                    final SimpleDirectedGraph graph,
+                    final IVertex<String> from,
+                    final IVertex<String> to,
+                    final int weight
+            ) {
+        return findEdge(graph, from, to, weight).isPresent();
     }
 
     private static boolean addEdge
