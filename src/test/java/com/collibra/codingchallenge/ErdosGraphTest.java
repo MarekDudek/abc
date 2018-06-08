@@ -11,7 +11,6 @@ import org.junit.Test;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.hendrix.erdos.types.Edge.EDGE_DIRECTION.DIRECTED;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -83,24 +82,37 @@ public final class ErdosGraphTest {
     }
 
     @Test
-    @Ignore
-    public void add_edge() {
+    public void adding_and_removing_edges() {
+        // given
+        final String from = "from";
+        final String to = "to";
+        final int weight = 10;
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
-        // then
-        // ...
-        // when
-        final IVertex<String> node1 = vertex("node1");
-        final IVertex<String> node2 = vertex("node2");
-        graph.addVertex(node1);
-        graph.addVertex(node2);
-        final Edge edge = new Edge(vertex("node1"), vertex("node2"), DIRECTED, 23);
-        edge.setData("node1-node2-23");
-        graph.addEdge(edge);
-        // then
-        //graph.edges().parallelStream()
-        // when
+
+        assertThat(exists(graph, edge(from, to, weight)), is(false));
+        assertThat(exists(graph, edge(from, to)), is(false));
 
 
+    }
+
+    private Edge edge(String from, String to, int weight) {
+        return null;
+    }
+
+    private Edge edge(final String from, final String to) {
+        return null;
+    }
+
+    private static Optional<IVertex> find
+            (
+                    final AbstractGraph graph,
+                    final Edge query
+            ) {
+        return Optional.empty();
+    }
+
+    private static boolean exists(final AbstractGraph graph, final Edge query) {
+        return find(graph, query).isPresent();
     }
 }
