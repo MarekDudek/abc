@@ -115,7 +115,12 @@ public final class ErdosGraphTest {
         assertThat(edgeExists(graph, vertex(from), vertex(to), weight), is(true));
         // when
         final boolean addedAgain = addEdge(graph, vertex(from), vertex(to), weight);
+        // then
         assertThat(addedAgain, is(false));
+        // then
+        final boolean removed = removeEdge(graph, vertex(from), vertex(to), weight);
+        // then
+        assertThat(removed, is(false));
     }
 
     private static Optional<Edge> findEdge
@@ -172,6 +177,11 @@ public final class ErdosGraphTest {
                 return true;
             }
         }
+        return false;
+    }
+
+    private boolean removeEdge(SimpleDirectedGraph graph, IVertex<String> vertex, IVertex<String> vertex1, int weight
+    ) {
         return false;
     }
 }
