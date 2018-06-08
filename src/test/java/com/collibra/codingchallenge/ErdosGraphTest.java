@@ -5,7 +5,6 @@ import com.hendrix.erdos.graphs.SimpleDirectedGraph;
 import com.hendrix.erdos.types.Edge;
 import com.hendrix.erdos.types.IVertex;
 import com.hendrix.erdos.types.Vertex;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Objects;
@@ -89,18 +88,18 @@ public final class ErdosGraphTest {
         final int weight = 10;
         // when
         final SimpleDirectedGraph graph = new SimpleDirectedGraph();
-
-        assertThat(exists(graph, edge(from, to, weight)), is(false));
-        assertThat(exists(graph, edge(from, to)), is(false));
+        // then
+        assertThat(exists(graph, edge(vertex(from), vertex(to), weight)), is(false));
+        assertThat(exists(graph, edge(vertex(from), vertex(to))), is(false));
 
 
     }
 
-    private Edge edge(String from, String to, int weight) {
+    private Edge edge(IVertex<String> from, IVertex<String> to, int weight) {
         return null;
     }
 
-    private Edge edge(final String from, final String to) {
+    private Edge edge(final IVertex<String> from, final IVertex<String> to) {
         return null;
     }
 
@@ -109,6 +108,7 @@ public final class ErdosGraphTest {
                     final AbstractGraph graph,
                     final Edge query
             ) {
+
         return Optional.empty();
     }
 
