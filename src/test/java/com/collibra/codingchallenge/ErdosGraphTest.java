@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.IntPredicate;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -121,31 +122,15 @@ public final class ErdosGraphTest {
             (
                     final AbstractGraph graph,
                     final IVertex from,
-                    final IVertex to
-            ) {
-        for (final Edge e : graph.edges()) {
-            final boolean f = EQUALS.test(e.getV1(), from);
-            final boolean t = EQUALS.test(e.getV2(), to);
-            if (f && t) {
-                return Optional.of(e);
-            }
-
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<Edge> findEdge
-            (
-                    final AbstractGraph graph,
-                    final IVertex from,
                     final IVertex to,
-                    final int weight
+                    final Optional<Integer> weight
             ) {
         for (final Edge e : graph.edges()) {
             final boolean f = EQUALS.test(e.getV1(), from);
             final boolean t = EQUALS.test(e.getV2(), to);
-            final boolean w = e.getWeight() == weight;
-            if (f && t && w) {
+            final IntPredicate weighEqual = w -> w == e.getWeight();
+            final Optional<Boolean> w = weight.map(weighEqual::test);
+            if (f && t && w.orElse(true)) {
                 return Optional.of(e);
             }
         }
@@ -158,7 +143,7 @@ public final class ErdosGraphTest {
                     final IVertex<String> from,
                     final IVertex<String> to
             ) {
-        return findEdge(graph, from, to).isPresent();
+        return findEdge(graph, from, to, Optional.empty()).isPresent();
     }
 
     private Boolean edgeExists
@@ -168,7 +153,7 @@ public final class ErdosGraphTest {
                     final IVertex<String> to,
                     final int weight
             ) {
-        return findEdge(graph, from, to, weight).isPresent();
+        return findEdge(graph, from, to, Optional.of(weight)).isPresent();
     }
 
     private static boolean addEdge
@@ -181,7 +166,7 @@ public final class ErdosGraphTest {
         final Optional<IVertex> f = findVertex(graph, from);
         final Optional<IVertex> t = findVertex(graph, to);
         if (f.isPresent() && t.isPresent()) {
-            final Optional<Edge> edge = findEdge(graph, f.get(), t.get());
+            final Optional<Edge> edge = findEdge(graph, f.get(), t.get(), Optional.of(weight));
             if (!edge.isPresent()) {
                 graph.addEdge(f.get(), t.get(), weight);
                 return true;
