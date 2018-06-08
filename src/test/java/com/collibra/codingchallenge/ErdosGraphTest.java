@@ -133,8 +133,8 @@ public final class ErdosGraphTest {
         for (final Edge e : graph.edges()) {
             final boolean f = EQUALS.test(e.getV1(), from);
             final boolean t = EQUALS.test(e.getV2(), to);
-            final IntPredicate weighEqual = w -> w == e.getWeight();
-            final Optional<Boolean> w = weight.map(weighEqual::test);
+            final IntPredicate equal = w -> w == e.getWeight();
+            final Optional<Boolean> w = weight.map(equal::test);
             if (f && t && w.orElse(true)) {
                 return Optional.of(e);
             }
@@ -168,11 +168,12 @@ public final class ErdosGraphTest {
                     final IVertex<String> to,
                     final int weight
             ) {
-        final Optional<IVertex> f = findVertex(graph, from);
-        final Optional<IVertex> t = findVertex(graph, to);
-        if (f.isPresent() && t.isPresent()) {
-            final Optional<Edge> edge = findEdge(graph, f.get(), t.get(), Optional.of(weight));
-            if (!edge.isPresent()) {
+
+        final Optional<Edge> edge = findEdge(graph, from, to, Optional.of(weight));
+        if (!edge.isPresent()) {
+            final Optional<IVertex> f = findVertex(graph, from);
+            final Optional<IVertex> t = findVertex(graph, to);
+            if (f.isPresent() && t.isPresent()) {
                 graph.addEdge(f.get(), t.get(), weight);
                 return true;
             }
@@ -180,7 +181,9 @@ public final class ErdosGraphTest {
         return false;
     }
 
-    private boolean removeEdge(SimpleDirectedGraph graph, IVertex<String> vertex, IVertex<String> vertex1, int weight
+
+    private boolean removeEdge(SimpleDirectedGraph graph, IVertex<String> vertex, IVertex<String> vertex1,
+                               int weight
     ) {
         return false;
     }
