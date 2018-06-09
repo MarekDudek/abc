@@ -1,6 +1,6 @@
 package com.collibra.codingchallenge;
 
-import com.hendrix.erdos.graphs.SimpleDirectedGraph;
+import com.hendrix.erdos.graphs.AbstractGraph;
 import org.junit.Test;
 
 import static com.collibra.codingchallenge.graphs.Graphs.*;
@@ -14,7 +14,7 @@ public final class ErdosGraphTest {
         // given
         final String id = "node";
         // when
-        final SimpleDirectedGraph graph = new SimpleDirectedGraph();
+        final AbstractGraph graph = directedGraph();
         // then
         assertThat(nodeExists(graph, node(id)), is(false));
         // when
@@ -43,7 +43,7 @@ public final class ErdosGraphTest {
         final String to = "to";
         final int weight = 10;
         // when
-        final SimpleDirectedGraph graph = new SimpleDirectedGraph();
+        final AbstractGraph graph = directedGraph();
         // then
         assertThat(edgeExists(graph, node(from), node(to)), is(false));
         assertThat(edgeExists(graph, node(from), node(to), weight), is(false));

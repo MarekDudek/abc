@@ -23,7 +23,6 @@ public final class Graphs {
     private static final BiPredicate<IVertex, IVertex> NODES_EQUAL =
             (a, b) -> Objects.equals(a.getData(), b.getData());
 
-
     private static final FourPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGE_EQUALS =
             (e, from, to, weight) -> {
                 final boolean f = NODES_EQUAL.test(e.getV1(), from);
@@ -33,6 +32,10 @@ public final class Graphs {
                 return f && t && w.orElse(true);
             };
 
+
+    public static SimpleDirectedGraph directedGraph() {
+        return new SimpleDirectedGraph();
+    }
 
     public static IVertex<String> node(final String id) {
         final IVertex<String> node = new Vertex<>();
@@ -96,7 +99,7 @@ public final class Graphs {
 
     public static int removeEdges
             (
-                    final SimpleDirectedGraph graph,
+                    final AbstractGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery
             ) {
@@ -107,7 +110,7 @@ public final class Graphs {
 
     public static boolean edgeExists
             (
-                    final SimpleDirectedGraph graph,
+                    final AbstractGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery
             ) {
@@ -116,7 +119,7 @@ public final class Graphs {
 
     public static Boolean edgeExists
             (
-                    final SimpleDirectedGraph graph,
+                    final AbstractGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery,
                     final int weightQuery
