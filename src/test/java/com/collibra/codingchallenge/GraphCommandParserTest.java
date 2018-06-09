@@ -15,10 +15,10 @@ public final class GraphCommandParserTest {
     @Test
     public void add_node() {
         // when
-        final Optional<GraphCommand> command = GraphCommandParser.parse("ADD NODE node");
+        final Optional<GraphCommand> command = GraphCommandParser.parse("ADD NODE 96c2a169-2dc5-4f23-831b-5d7be4d30129");
         // then
         assertTrue(command.isPresent());
-        assertThat(command.get(), is(new AddNode("node")));
+        assertThat(command.get(), is(new AddNode("96c2a169-2dc5-4f23-831b-5d7be4d30129")));
     }
 
     @Test

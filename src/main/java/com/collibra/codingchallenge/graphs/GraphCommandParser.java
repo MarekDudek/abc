@@ -12,10 +12,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static com.collibra.codingchallenge.utils.Parsing.*;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 public final class GraphCommandParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphCommandParser.class);
-
 
     public static Optional<GraphCommand> parse(final String request) {
         final BiFunction<Optional<GraphCommand>, Parser, Optional<GraphCommand>> first =
@@ -33,7 +35,7 @@ public final class GraphCommandParser {
     private enum Parser {
 
         ADD_NODE(
-                Pattern.compile("ADD NODE (.*)")
+                Pattern.compile(s + "ADD" + s + "NODE" + s + NODE + s, CASE_INSENSITIVE)
         ) {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
@@ -47,7 +49,7 @@ public final class GraphCommandParser {
         },
 
         ADD_EDGE(
-                Pattern.compile("ADD EDGE (.*) (.*) (.*)")
+                Pattern.compile(s + "ADD" + s + "EDGE" + s + NODE + s + NODE + s + WEIGHT + s, CASE_INSENSITIVE)
         ) {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
@@ -64,7 +66,7 @@ public final class GraphCommandParser {
         },
 
         REMOVE_NODE(
-                Pattern.compile("REMOVE NODE (.*)")
+                Pattern.compile(s + "REMOVE" + s + "NODE" + s + NODE + s, CASE_INSENSITIVE)
         ) {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
@@ -78,7 +80,7 @@ public final class GraphCommandParser {
         },
 
         REMOVE_EDGE(
-                Pattern.compile("REMOVE EDGE (.*) (.*)")
+                Pattern.compile(s + "REMOVE" + s + "EDGE" + s + NODE + s + NODE + s, CASE_INSENSITIVE)
         ) {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
@@ -93,7 +95,7 @@ public final class GraphCommandParser {
         },
 
         SHORTEST_PATH(
-                Pattern.compile("SHORTEST PATH (.*) (.*)")
+                Pattern.compile(s + "SHORTEST" + s + "PATH" + s + NODE + s + NODE + s, CASE_INSENSITIVE)
         ) {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
@@ -108,7 +110,7 @@ public final class GraphCommandParser {
         },
 
         CLOSER_THAN(
-                Pattern.compile("CLOSER THAN (.*) (.*)")
+                Pattern.compile(s + "CLOSER" + s + "THAN" + s + WEIGHT + s + NODE + s, CASE_INSENSITIVE)
         ) {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
