@@ -67,7 +67,7 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
-    
+
     <dependencies>
         <!-- general -->
         <dependency>

@@ -1,4 +1,4 @@
-package com.collibra.codingchallenge;
+package com.collibra.codingchallenge.utils;
 
 public final class Utils {
 

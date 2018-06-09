@@ -5,12 +5,13 @@ import com.collibra.codingchallenge.commands.*;
 import com.hendrix.erdos.graphs.AbstractGraph;
 import com.hendrix.erdos.types.IVertex;
 
-import static com.collibra.codingchallenge.commands.GraphCommands.match;
+import static com.collibra.codingchallenge.GraphCommand.match;
 import static com.collibra.codingchallenge.graphs.Graphs.*;
 
 public final class GraphManager {
 
     private final AbstractGraph graph = directedGraph();
+
 
     public String handle(final GraphCommand command) {
         return match(
@@ -24,7 +25,7 @@ public final class GraphManager {
         );
     }
 
-    
+
     private String handleAddNode(final AddNode command) {
         final IVertex<String> node = node(command.node);
         final boolean added = addNode(graph, node);

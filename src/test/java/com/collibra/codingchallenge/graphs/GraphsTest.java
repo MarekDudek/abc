@@ -1,4 +1,4 @@
-package com.collibra.codingchallenge;
+package com.collibra.codingchallenge.graphs;
 
 import com.hendrix.erdos.graphs.AbstractGraph;
 import org.junit.Test;

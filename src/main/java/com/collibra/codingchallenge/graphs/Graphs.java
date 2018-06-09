@@ -1,5 +1,7 @@
 package com.collibra.codingchallenge.graphs;
 
+import com.collibra.codingchallenge.utils.QuaterPredicate;
+import com.google.common.annotations.VisibleForTesting;
 import com.hendrix.erdos.graphs.AbstractGraph;
 import com.hendrix.erdos.graphs.SimpleDirectedGraph;
 import com.hendrix.erdos.types.Edge;
@@ -14,16 +16,12 @@ import java.util.function.IntPredicate;
 
 import static java.util.stream.Collectors.toList;
 
-public final class Graphs {
-
-    private interface FourPredicate<A, B, C, D> {
-        boolean test(A a, B b, C c, D d);
-    }
+final class Graphs {
 
     private static final BiPredicate<IVertex, IVertex> NODES_EQUAL =
             (a, b) -> Objects.equals(a.getData(), b.getData());
 
-    private static final FourPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGE_EQUALS =
+    private static final QuaterPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGE_EQUALS =
             (e, from, to, weight) -> {
                 final boolean f = NODES_EQUAL.test(e.getV1(), from);
                 final boolean t = NODES_EQUAL.test(e.getV2(), to);
@@ -33,17 +31,18 @@ public final class Graphs {
             };
 
 
-    public static SimpleDirectedGraph directedGraph() {
+    static SimpleDirectedGraph directedGraph() {
         return new SimpleDirectedGraph();
     }
 
-    public static IVertex<String> node(final String id) {
+
+    static IVertex<String> node(final String id) {
         final IVertex<String> node = new Vertex<>();
         node.setData(id);
         return node;
     }
 
-    public static boolean addNode(final AbstractGraph graph, final IVertex node) {
+    static boolean addNode(final AbstractGraph graph, final IVertex node) {
         return findNode(graph, node).map(
                 found -> false
         ).orElseGet(
@@ -54,7 +53,7 @@ public final class Graphs {
         );
     }
 
-    public static boolean removeNode(final AbstractGraph graph, final IVertex query) {
+    static boolean removeNode(final AbstractGraph graph, final IVertex query) {
         return findNode(graph, query).map(
                 graph::removeVertex
         ).orElse(
@@ -62,7 +61,8 @@ public final class Graphs {
         );
     }
 
-    public static boolean nodeExists(final AbstractGraph graph, final IVertex query) {
+    @VisibleForTesting
+    static boolean nodeExists(final AbstractGraph graph, final IVertex query) {
         return findNode(graph, query).isPresent();
     }
 
@@ -75,7 +75,7 @@ public final class Graphs {
     }
 
 
-    public static boolean addEdge
+    static boolean addEdge
             (
                     final AbstractGraph graph,
                     final IVertex<String> fromQuery,
@@ -97,7 +97,7 @@ public final class Graphs {
         }
     }
 
-    public static int removeEdges
+    static int removeEdges
             (
                     final AbstractGraph graph,
                     final IVertex<String> fromQuery,
@@ -108,7 +108,8 @@ public final class Graphs {
         return edges.size();
     }
 
-    public static boolean edgeExists
+    @VisibleForTesting
+    static boolean edgeExists
             (
                     final AbstractGraph graph,
                     final IVertex<String> fromQuery,
@@ -117,7 +118,8 @@ public final class Graphs {
         return findEdge(graph, fromQuery, toQuery, Optional.empty()).isPresent();
     }
 
-    public static Boolean edgeExists
+    @VisibleForTesting
+    static Boolean edgeExists
             (
                     final AbstractGraph graph,
                     final IVertex<String> fromQuery,
