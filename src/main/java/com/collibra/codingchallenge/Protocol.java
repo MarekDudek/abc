@@ -12,11 +12,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import static com.collibra.codingchallenge.Messages.*;
 import static java.lang.String.format;
-import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 @RequiredArgsConstructor
 final class Protocol implements AutoCloseable {
@@ -25,17 +23,17 @@ final class Protocol implements AutoCloseable {
 
     private final Socket socket;
     private final UUID sessionID;
-    private final long started;
 
     private BufferedReader client;
     private PrintWriter server;
+    private long started;
 
     private String name;
 
-    Protocol initialized() throws IOException {
+    void initialize() throws IOException {
         client = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         server = new PrintWriter(socket.getOutputStream(), true);
-        return this;
+        started = System.currentTimeMillis();
     }
 
     @Override
@@ -44,35 +42,39 @@ final class Protocol implements AutoCloseable {
         IOUtils.closeQuietly(server);
     }
 
-    void greetEachOther() throws IOException {
+    void exchangeFormalities() throws IOException {
 
-        final String serverIntro = format("HI, I'M %s", sessionID);
-        LOGGER.info("server introduction - '{}'", serverIntro);
-        server.println(serverIntro);
+        final String firstMessage = format(SERVER_FIRST_MESSAGE, sessionID);
+        LOGGER.info("Server first message is '{}'", firstMessage);
+        server.println(firstMessage);
 
-        final String clientIntro = client.readLine();
-        LOGGER.info("client introduction - '{}'", clientIntro);
+        final String clientResponse = client.readLine();
+        LOGGER.info("Client response was '{}'", clientResponse);
 
-        name = clientName(clientIntro);
+        name = Messages.nodeName(clientResponse).orElseGet(
+                () -> {
+                    LOGGER.warn("Unable to parse client's name");
+                    return "anonymous";
+                });
 
-        final String greeting = format("HI %s", name);
-        LOGGER.info("server greeting - '{}'", greeting);
-        server.println(greeting);
+        final String serverResponse = format(SERVER_RESPONSE, name);
+        LOGGER.info("Server response is '{}'", serverResponse);
+        server.println(serverResponse);
     }
 
-    void sayGoodBye() {
+    void seeOff() {
 
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
 
-        final String goodBye = format("BYE %s, WE SPOKE FOR %d MS", name, duration);
-        LOGGER.info("good bye - '{}'", goodBye);
-        server.println(goodBye);
+        final String farewell = format(SERVER_FAREWELL, name, duration);
+        LOGGER.info("Server farewell is '{}'", farewell);
+        server.println(farewell);
     }
 
-    void apologise() {
-        final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
-        LOGGER.info("apology - '{}'", apology);
+    void notSupported() {
+        final String apology = SERVER_APOLOGY;
+        LOGGER.info("Server apology is '{}'", apology);
         server.println(apology);
     }
 
@@ -86,8 +88,8 @@ final class Protocol implements AutoCloseable {
             public boolean hasNext() {
                 try {
                     request = client.readLine();
-                    LOGGER.info("request - '{}'", request);
-                    return !(request == null || request.equals("BYE MATE!"));
+                    LOGGER.debug("Client request was '{}'", request);
+                    return !(request == null || Messages.clientEndedSession(request));
                 } catch (final IOException ignored) {
                     return false;
                 }
@@ -100,18 +102,8 @@ final class Protocol implements AutoCloseable {
         };
     }
 
-    void sendResponse(final String response) {
-        LOGGER.info("response - '{}'", response);
+    void respond(final String response) {
+        LOGGER.debug("Server response is '{}'", response);
         server.println(response);
-    }
-
-    private static final Pattern INTRODUCTION = Pattern.compile("HI, I'M (.+)", CASE_INSENSITIVE);
-
-    static String clientName(final String introduction) {
-        final Matcher matcher = INTRODUCTION.matcher(introduction);
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-        return null;
     }
 }

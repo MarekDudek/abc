@@ -39,9 +39,8 @@ public final class GraphServer {
         while (true) {
             LOGGER.info("Waiting for clients ...");
             final Socket client = server.accept();
-            final long started = System.currentTimeMillis();
             client.setSoTimeout(timeout);
-            final ClientHandler handler = new ClientHandler(client, started, graph);
+            final ClientHandler handler = new ClientHandler(client, graph);
             new Thread(handler).start();
         }
     }
@@ -50,7 +49,6 @@ public final class GraphServer {
     private static class ClientHandler implements Runnable {
 
         private final Socket socket;
-        private final long started;
         private final GraphManager graph;
         private final UUID sessionID = UUID.randomUUID();
 
@@ -59,26 +57,23 @@ public final class GraphServer {
             LOGGER.info("Client {} on {} started", sessionID, socket);
             Protocol protocol = null;
             try {
-                protocol = new Protocol(socket, sessionID, started).initialized();
-                protocol.greetEachOther();
+                protocol = new Protocol(socket, sessionID);
+                protocol.initialize();
+                protocol.exchangeFormalities();
                 for (final String request : protocol.requests()) {
                     final Optional<GraphCommand> command = GraphCommandParser.parse(request);
                     if (command.isPresent()) {
                         final String response = graph.handle(command.get());
-                        if (response == null) {
-                            protocol.apologise();
-                        } else {
-                            protocol.sendResponse(response);
-                        }
+                        protocol.respond(response);
                     } else {
-                        protocol.apologise();
+                        protocol.notSupported();
                     }
                 }
             } catch (final IOException e) {
                 LOGGER.error("Client {} on {} failed with message '{}'", sessionID, socket, e.getMessage());
             } finally {
                 if (protocol != null) {
-                    protocol.sayGoodBye();
+                    protocol.seeOff();
                     protocol.close();
                 }
             }
