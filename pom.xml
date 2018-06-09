@@ -88,16 +88,6 @@
         </dependency>
         <!-- graphs -->
         <dependency>
-            <groupId>com.github.Erdos-Graph-Framework</groupId>
-            <artifactId>Erdos</artifactId>
-            <version>v1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-core</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-api</artifactId>
             <version>${jung.version}</version>
