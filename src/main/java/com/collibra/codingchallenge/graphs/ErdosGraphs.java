@@ -2,11 +2,15 @@ package com.collibra.codingchallenge.graphs;
 
 import com.collibra.codingchallenge.utils.QuaterPredicate;
 import com.google.common.annotations.VisibleForTesting;
-import com.hendrix.erdos.graphs.AbstractGraph;
+import com.hendrix.erdos.algorithms.AllPairsShortPathResult;
+import com.hendrix.erdos.algorithms.FloydWarshall;
+import com.hendrix.erdos.graphs.IDirectedGraph;
 import com.hendrix.erdos.graphs.SimpleDirectedGraph;
 import com.hendrix.erdos.types.Edge;
 import com.hendrix.erdos.types.IVertex;
 import com.hendrix.erdos.types.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +20,10 @@ import java.util.function.IntPredicate;
 
 import static java.util.stream.Collectors.toList;
 
-final class Graphs {
+final class ErdosGraphs {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErdosGraphs.class);
+
 
     private static final BiPredicate<IVertex, IVertex> NODES_EQUAL =
             (a, b) -> Objects.equals(a.getData(), b.getData());
@@ -31,7 +38,7 @@ final class Graphs {
             };
 
 
-    static SimpleDirectedGraph directedGraph() {
+    static IDirectedGraph directedGraph() {
         return new SimpleDirectedGraph();
     }
 
@@ -42,7 +49,7 @@ final class Graphs {
         return node;
     }
 
-    static boolean addNode(final AbstractGraph graph, final IVertex node) {
+    static boolean addNode(final IDirectedGraph graph, final IVertex node) {
         return findNode(graph, node).
                 map(
                         found -> false
@@ -55,7 +62,7 @@ final class Graphs {
                 );
     }
 
-    static boolean removeNode(final AbstractGraph graph, final IVertex query) {
+    static boolean removeNode(final IDirectedGraph graph, final IVertex query) {
         return findNode(graph, query).
                 map(
                         graph::removeVertex
@@ -66,11 +73,11 @@ final class Graphs {
     }
 
     @VisibleForTesting
-    static boolean nodeExists(final AbstractGraph graph, final IVertex query) {
+    static boolean nodeExists(final IDirectedGraph graph, final IVertex query) {
         return findNode(graph, query).isPresent();
     }
 
-    private static Optional<IVertex> findNode(final AbstractGraph graph, final IVertex query) {
+    private static Optional<IVertex> findNode(final IDirectedGraph graph, final IVertex query) {
         return graph.vertices().stream().
                 filter(
                         n -> NODES_EQUAL.test(n, query)
@@ -81,7 +88,7 @@ final class Graphs {
 
     static boolean addEdge
             (
-                    final AbstractGraph graph,
+                    final IDirectedGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery,
                     final int weight
@@ -103,7 +110,7 @@ final class Graphs {
 
     static int removeEdges
             (
-                    final AbstractGraph graph,
+                    final IDirectedGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery
             ) {
@@ -115,7 +122,7 @@ final class Graphs {
     @VisibleForTesting
     static boolean edgeExists
             (
-                    final AbstractGraph graph,
+                    final IDirectedGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery
             ) {
@@ -125,7 +132,7 @@ final class Graphs {
     @VisibleForTesting
     static Boolean edgeExists
             (
-                    final AbstractGraph graph,
+                    final IDirectedGraph graph,
                     final IVertex<String> fromQuery,
                     final IVertex<String> toQuery,
                     final int weightQuery
@@ -135,7 +142,7 @@ final class Graphs {
 
     private static Optional<Edge> findEdge
             (
-                    final AbstractGraph graph,
+                    final IDirectedGraph graph,
                     final IVertex from,
                     final IVertex to,
                     final Optional<Integer> weight
@@ -149,7 +156,7 @@ final class Graphs {
 
     private static List<Edge> findEdges
             (
-                    final AbstractGraph graph,
+                    final IDirectedGraph graph,
                     final IVertex fromQuery,
                     final IVertex toQuery
             ) {
@@ -158,5 +165,25 @@ final class Graphs {
                         e -> EDGES_EQUAL.test(e, fromQuery, toQuery, Optional.empty())
                 ).
                 collect(toList());
+    }
+
+    static Optional<Integer> shortestPath
+            (
+                    final IDirectedGraph graph,
+                    final IVertex fromQuery,
+                    final IVertex toQuery
+            ) {
+        final Optional<IVertex> f = findNode(graph, fromQuery);
+        final Optional<IVertex> t = findNode(graph, toQuery);
+        if (f.isPresent() && t.isPresent()) {
+            LOGGER.info("shortest path, Floyd-Warshall starting ...");
+            final AllPairsShortPathResult result = new FloydWarshall(graph).applyAlgorithm();
+            LOGGER.info("shortest path, calculating distance ...");
+            final float distance = result.shortDistanceBetween(f.get(), t.get());
+            LOGGER.info("... calculated.");
+            final int weight = Math.round(distance);
+            return Optional.of(weight);
+        }
+        return Optional.empty();
     }
 }

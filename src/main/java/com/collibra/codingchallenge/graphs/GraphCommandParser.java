@@ -129,10 +129,10 @@ public final class GraphCommandParser {
         abstract Optional<GraphCommand> parse(String text);
 
         Optional<GraphCommand> parseAndLog(final String text) {
-            LOGGER.info("parsing " + name());
+            LOGGER.trace("parsing " + name());
             final Optional<GraphCommand> command = parse(text);
             command.ifPresent(
-                    c -> LOGGER.info("{}", c)
+                    c -> LOGGER.debug("{}", c)
             );
             return command;
         }
