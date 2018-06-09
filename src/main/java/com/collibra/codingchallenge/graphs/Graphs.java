@@ -75,30 +75,32 @@ public final class Graphs {
     public static boolean addEdge
             (
                     final AbstractGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to,
+                    final IVertex<String> fromQuery,
+                    final IVertex<String> toQuery,
                     final int weight
             ) {
 
-        final Optional<Edge> edge = findEdge(graph, from, to, Optional.of(weight));
-        if (!edge.isPresent()) {
-            final Optional<IVertex> f = findNode(graph, from);
-            final Optional<IVertex> t = findNode(graph, to);
-            if (f.isPresent() && t.isPresent()) {
-                graph.addEdge(f.get(), t.get(), weight);
+        final Optional<Edge> edge = findEdge(graph, fromQuery, toQuery, Optional.of(weight));
+        if (edge.isPresent()) {
+            return false;
+        } else {
+            final Optional<IVertex> from = findNode(graph, fromQuery);
+            final Optional<IVertex> to = findNode(graph, toQuery);
+            if (from.isPresent() && to.isPresent()) {
+                graph.addEdge(from.get(), to.get(), weight);
                 return true;
             }
+            return false;
         }
-        return false;
     }
 
-    public static int removeEdge
+    public static int removeEdges
             (
                     final SimpleDirectedGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to
+                    final IVertex<String> fromQuery,
+                    final IVertex<String> toQuery
             ) {
-        final List<Edge> edges = findEdges(graph, from, to);
+        final List<Edge> edges = findEdges(graph, fromQuery, toQuery);
         edges.forEach(graph::removeEdge);
         return edges.size();
     }
@@ -106,20 +108,20 @@ public final class Graphs {
     public static boolean edgeExists
             (
                     final SimpleDirectedGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to
+                    final IVertex<String> fromQuery,
+                    final IVertex<String> toQuery
             ) {
-        return findEdge(graph, from, to, Optional.empty()).isPresent();
+        return findEdge(graph, fromQuery, toQuery, Optional.empty()).isPresent();
     }
 
     public static Boolean edgeExists
             (
                     final SimpleDirectedGraph graph,
-                    final IVertex<String> from,
-                    final IVertex<String> to,
-                    final int weight
+                    final IVertex<String> fromQuery,
+                    final IVertex<String> toQuery,
+                    final int weightQuery
             ) {
-        return findEdge(graph, from, to, Optional.of(weight)).isPresent();
+        return findEdge(graph, fromQuery, toQuery, Optional.of(weightQuery)).isPresent();
     }
 
     private static Optional<Edge> findEdge
@@ -139,12 +141,12 @@ public final class Graphs {
     private static List<Edge> findEdges
             (
                     final AbstractGraph graph,
-                    final IVertex from,
-                    final IVertex to
+                    final IVertex fromQuery,
+                    final IVertex toQuery
             ) {
         return graph.edges().stream().
                 filter(
-                        e -> EDGE_EQUALS.test(e, from, to, Optional.empty())
+                        e -> EDGE_EQUALS.test(e, fromQuery, toQuery, Optional.empty())
                 ).
                 collect(toList());
     }

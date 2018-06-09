@@ -60,11 +60,11 @@ public final class ErdosGraphTest {
         // then
         assertThat(addedAgain, is(false));
         // when
-        final int removed = removeEdge(graph, node(from), node(to));
+        final int removed = removeEdges(graph, node(from), node(to));
         // then
         assertThat(removed, is(1));
         // when
-        final int removedAgain = removeEdge(graph, node(from), node(to));
+        final int removedAgain = removeEdges(graph, node(from), node(to));
         // then
         assertThat(removedAgain, is(0));
         // when
