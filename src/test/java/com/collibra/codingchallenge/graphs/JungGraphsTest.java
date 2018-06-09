@@ -6,6 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.junit.Test;
 
+import static com.collibra.codingchallenge.graphs.ErdosGraphs.node;
+import static com.collibra.codingchallenge.graphs.ErdosGraphs.removeNode;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 public final class JungGraphsTest {
 
     @Test
@@ -15,7 +20,25 @@ public final class JungGraphsTest {
         // when
         final DirectedSparseMultigraph<MyNode, MyEdge> graph = new DirectedSparseMultigraph<>();
         // then
-        graph.containsVertex(new MyNode(id));
+        assertThat(graph.containsVertex(new MyNode(id)), is(false));
+        // when
+        final boolean added = graph.addVertex(new MyNode(id));
+        // then
+        assertThat(added, is(true));
+        assertThat(graph.containsVertex(new MyNode(id)), is(true));
+        // when
+        final boolean addedAgain = graph.addVertex(new MyNode(id));
+        // then
+        assertThat(addedAgain, is(false));
+        // when
+        final boolean removed = graph.removeVertex(new MyNode(id));
+        // then
+        assertThat(removed, is(true));
+        assertThat(graph.containsVertex(new MyNode(id)), is(false));
+        // when
+        final boolean removedAgain = graph.removeVertex(new MyNode(id));
+        // then
+        assertThat(removedAgain, is(false));
     }
 }
 
