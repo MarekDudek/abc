@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -208,7 +209,16 @@ public final class JungGraphsTest {
                 };
         final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
         final Graph<Node, Edge> closer = filter.transform(graph);
-        final String response = closer.getVertices().stream().sorted(comparing(n -> n.name)).map(n -> n.name).collect(joining(","));
+        final String response = closer.getVertices().stream().
+                map(
+                        n -> n.name
+                ).
+                sorted(
+                        naturalOrder()
+                ).
+                collect(
+                        joining(",")
+                );
         // then
         assertThat(response, is("Madeleine,Michael"));
     }

@@ -1,7 +1,6 @@
 package com.collibra.codingchallenge.graphs;
 
 import com.collibra.codingchallenge.commands.*;
-import com.google.common.collect.Ordering;
 import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
@@ -10,13 +9,12 @@ import org.apache.commons.collections15.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.lang.String.format;
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -110,22 +108,34 @@ public final class JungGraphManager implements GraphManager {
 
     private String handleCloserThan(final CloserThan command) {
         final Node start = new Node(command.node);
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
-        final Predicate<Node> predicate =
-                node -> {
-                    if (node.equals(start)) {
-                        return false;
-                    }
-                    final Number distance = shortestPath.getDistance(start, node);
-                    if (distance == null) {
-                        return false;
-                    }
-                    final int weight = distance.intValue();
-                    return weight < command.weight;
-                };
-        final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
-        final Graph<Node, Edge> closer = filter.transform(graph);
-        final String response = closer.getVertices().stream().sorted(Comparator.comparing(a -> a.name)).map(n -> n.name).collect(joining(","));
-        return response;
+        if (graph.containsVertex(start)) {
+            final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
+            final Predicate<Node> predicate =
+                    node -> {
+                        if (node.equals(start)) {
+                            return false;
+                        }
+                        final Number distance = shortestPath.getDistance(start, node);
+                        if (distance == null) {
+                            return false;
+                        }
+                        final int weight = distance.intValue();
+                        return weight < command.weight;
+                    };
+            final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
+            final Graph<Node, Edge> closer = filter.transform(graph);
+            return closer.getVertices().stream().
+                    map(
+                            n -> n.name
+                    ).
+                    sorted(
+                            naturalOrder()
+                    ).
+                    collect(
+                            joining(",")
+                    );
+        } else {
+            return "ERROR: NODE NOT FOUND";
+        }
     }
 }
