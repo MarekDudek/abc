@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
 
 public final class ErdosGraphTest {
 
-    private static final BiPredicate<IVertex, IVertex> EQUALS =
+    private static final BiPredicate<IVertex, IVertex> VERTICES_EQUAL =
             (a, b) -> Objects.equals(a.getData(), b.getData());
 
     private static IVertex<String> vertex(final String id) {
@@ -27,12 +27,11 @@ public final class ErdosGraphTest {
     }
 
     private static Optional<IVertex> findVertex(final AbstractGraph graph, final IVertex query) {
-        for (final IVertex vertex : graph.vertices()) {
-            if (EQUALS.test(query, vertex)) {
-                return Optional.of(vertex);
-            }
-        }
-        return Optional.empty();
+        return graph.vertices().stream().
+                filter(
+                        v -> VERTICES_EQUAL.test(v, query)
+                ).
+                findFirst();
     }
 
     private static Optional<IVertex> findVertex(final AbstractGraph graph, final String query) {
@@ -118,7 +117,7 @@ public final class ErdosGraphTest {
         // then
         assertThat(addedAgain, is(false));
         // then
-        final boolean removed = removeEdge(graph, vertex(from), vertex(to), weight);
+        final boolean removed = removeEdge(graph, vertex(from), vertex(to));
         // then
         assertThat(removed, is(false));
     }
@@ -130,16 +129,25 @@ public final class ErdosGraphTest {
                     final IVertex to,
                     final Optional<Integer> weight
             ) {
-        for (final Edge e : graph.edges()) {
-            final boolean f = EQUALS.test(e.getV1(), from);
-            final boolean t = EQUALS.test(e.getV2(), to);
-            final IntPredicate equal = w -> w == e.getWeight();
-            final Optional<Boolean> w = weight.map(equal::test);
-            if (f && t && w.orElse(true)) {
-                return Optional.of(e);
-            }
-        }
-        return Optional.empty();
+        return graph.edges().stream().
+                filter(
+                        e -> EDGE_EQUALS.test(e, from, to, weight)
+                ).
+                findFirst();
+    }
+
+    private static final FourPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGE_EQUALS =
+            (e, from, to, weight) -> {
+                final boolean f = VERTICES_EQUAL.test(e.getV1(), from);
+                final boolean t = VERTICES_EQUAL.test(e.getV2(), to);
+                final IntPredicate equal = w -> w == e.getWeight();
+                final Optional<Boolean> w = weight.map(equal::test);
+                return f && t && w.orElse(true);
+            };
+
+
+    interface FourPredicate<A, B, C, D> {
+        boolean test(A a, B b, C c, D d);
     }
 
     private boolean edgeExists
@@ -182,9 +190,12 @@ public final class ErdosGraphTest {
     }
 
 
-    private boolean removeEdge(SimpleDirectedGraph graph, IVertex<String> vertex, IVertex<String> vertex1,
-                               int weight
-    ) {
+    private boolean removeEdge
+            (
+                    final SimpleDirectedGraph graph,
+                    final IVertex<String> from,
+                    final IVertex<String> to
+            ) {
         return false;
     }
 }
