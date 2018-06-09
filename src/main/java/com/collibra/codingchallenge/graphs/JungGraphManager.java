@@ -46,16 +46,17 @@ public final class JungGraphManager implements GraphManager {
     private String handleAddEdge(final AddEdge command) {
         final Node from = new Node(command.from);
         final Node to = new Node(command.to);
-        final boolean added;
         if (graph.containsVertex(from) && graph.containsVertex(to)) {
             final Edge e = new Edge(command.weight, command.from, command.to);
-            added = graph.addEdge(e, from, to, DIRECTED);
+            if (graph.containsEdge(e)) {
+                LOGGER.warn("{} already exists", e);
+            } else {
+                graph.addEdge(e, from, to, DIRECTED);
+            }
+            return "EDGE ADDED";
         } else {
-            added = false;
+            return "ERROR: NODE NOT FOUND";
         }
-        return added
-                ? "EDGE ADDED"
-                : "ERROR: NODE NOT FOUND";
     }
 
     private String handleRemoveNode(final RemoveNode command) {
@@ -74,7 +75,7 @@ public final class JungGraphManager implements GraphManager {
                     filter(
                             e -> e.from.equals(command.from) && e.to.equals(command.to)
                     ).collect(toList());
-            for (final Edge e: edges) {
+            for (final Edge e : edges) {
                 if (graph.containsEdge(e)) {
                     graph.removeEdge(e);
                 }

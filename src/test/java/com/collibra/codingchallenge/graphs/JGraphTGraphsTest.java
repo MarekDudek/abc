@@ -1,6 +1,5 @@
 package com.collibra.codingchallenge.graphs;
 
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 import org.junit.Test;
@@ -52,7 +51,6 @@ public final class JGraphTGraphsTest {
         final DefaultWeightedEdge defaultEdge = null;
         final Supplier<DefaultWeightedEdge> edgeSupplier = graph.getEdgeSupplier();
         final DefaultWeightedEdge edge = edgeSupplier.get();
-
 
 
         graph.containsEdge(defaultEdge);

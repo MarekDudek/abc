@@ -7,7 +7,6 @@ import org.junit.Test;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
