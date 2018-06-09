@@ -7,11 +7,13 @@ import com.hendrix.erdos.types.IVertex;
 import com.hendrix.erdos.types.Vertex;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.IntPredicate;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -116,10 +118,23 @@ public final class ErdosGraphTest {
         final boolean addedAgain = addEdge(graph, vertex(from), vertex(to), weight);
         // then
         assertThat(addedAgain, is(false));
+        // when
+        final int removed = removeEdge(graph, vertex(from), vertex(to));
         // then
-        final boolean removed = removeEdge(graph, vertex(from), vertex(to));
+        assertThat(removed, is(1));
+        // when
+        final int removedAgain = removeEdge(graph, vertex(from), vertex(to));
         // then
-        assertThat(removed, is(false));
+        assertThat(removedAgain, is(0));
+        // when
+        final boolean addedYetAgain = addEdge(graph, vertex(from), vertex(to), weight);
+        // then
+        assertThat(addedYetAgain, is(true));
+        // when
+        final boolean fromRemoved = removeVertex(graph, vertex(from));
+        // then
+        assertThat(fromRemoved, is(true));
+        assertThat(edgeExists(graph, vertex(from), vertex(to)), is(false));
     }
 
     private static Optional<Edge> findEdge
@@ -134,6 +149,19 @@ public final class ErdosGraphTest {
                         e -> EDGE_EQUALS.test(e, from, to, weight)
                 ).
                 findFirst();
+    }
+
+    private static List<Edge> findEdges
+            (
+                    final AbstractGraph graph,
+                    final IVertex from,
+                    final IVertex to
+            ) {
+        return graph.edges().stream().
+                filter(
+                        e -> EDGE_EQUALS.test(e, from, to, Optional.empty())
+                ).
+                collect(toList());
     }
 
     private static final FourPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGE_EQUALS =
@@ -190,12 +218,14 @@ public final class ErdosGraphTest {
     }
 
 
-    private boolean removeEdge
+    private int removeEdge
             (
                     final SimpleDirectedGraph graph,
                     final IVertex<String> from,
                     final IVertex<String> to
             ) {
-        return false;
+        final List<Edge> edges = findEdges(graph, from, to);
+        edges.forEach(graph::removeEdge);
+        return edges.size();
     }
 }
