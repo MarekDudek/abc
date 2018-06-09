@@ -1,5 +1,6 @@
 package com.collibra.codingchallenge.graphs;
 
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,9 @@ import org.junit.Test;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public final class JungGraphsTest {
 
@@ -86,6 +89,58 @@ public final class JungGraphsTest {
         // then
         assertThat(toRemoved, is(true));
         assertThat(graph.containsVertex(new MyNode(to)), is(false));
+    }
+
+    @Test
+    public void shortest_path() {
+        // given
+        final String start = "start";
+        final String end = "end";
+        final String other = "other";
+        final DirectedSparseMultigraph<MyNode, MyEdge> graph = new DirectedSparseMultigraph<>();
+        graph.addVertex(new MyNode(start));
+        graph.addVertex(new MyNode(end));
+        graph.addVertex(new MyNode(other));
+        graph.addEdge(new MyEdge(start, end, 10), new MyNode(start), new MyNode(end), DIRECTED);
+        graph.addEdge(new MyEdge(start, other, 4), new MyNode(start), new MyNode(other), DIRECTED);
+        graph.addEdge(new MyEdge(other, end, 3), new MyNode(other), new MyNode(end), DIRECTED);
+        // when
+        final DijkstraShortestPath<MyNode, MyEdge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
+        final Number distance = algorithm.getDistance(new MyNode(start), new MyNode(end));
+        // then
+        assertThat(distance, is(7.0));
+    }
+
+    @Test
+    public void shortest_path__no_connection() {
+        // given
+        final String a = "a";
+        final String b = "b";
+        final DirectedSparseMultigraph<MyNode, MyEdge> graph = new DirectedSparseMultigraph<>();
+        graph.addVertex(new MyNode(a));
+        graph.addVertex(new MyNode(b));
+        // when
+        final DijkstraShortestPath<MyNode, MyEdge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
+        final Number distance = algorithm.getDistance(new MyNode(a), new MyNode(b));
+        // then
+        assertThat(distance, nullValue());
+    }
+
+    @Test
+    public void shortest_path__node_not_found() {
+        // given
+        final String a = "a";
+        final String b = "b";
+        final DirectedSparseMultigraph<MyNode, MyEdge> graph = new DirectedSparseMultigraph<>();
+        graph.addVertex(new MyNode(a));
+        // when
+        final DijkstraShortestPath<MyNode, MyEdge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
+        try {
+            algorithm.getDistance(new MyNode(a), new MyNode(b));
+            fail();
+        } catch (final IllegalArgumentException ignored) {
+        }
+        // then
     }
 }
 
