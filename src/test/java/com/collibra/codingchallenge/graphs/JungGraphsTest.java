@@ -1,12 +1,14 @@
 package com.collibra.codingchallenge.graphs;
 
+import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.Graph;
+import org.apache.commons.collections15.Predicate;
 import org.junit.Test;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -131,12 +133,43 @@ public final class JungGraphsTest {
         final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
         graph.addVertex(new Node(a));
         // when
-        final DijkstraShortestPath<Node, Edge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, n -> n.weight);
         try {
-            algorithm.getDistance(new Node(a), new Node(b));
+            shortestPath.getDistance(new Node(a), new Node(b));
             fail();
         } catch (final IllegalArgumentException ignored) {
         }
         // then
+    }
+
+    @Test
+    public void closer_than_again() {
+        // given
+        final String start = "start";
+        final String close = "close";
+        final String further = "further";
+        final String far = "far";
+        final int threshold = 5;
+        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
+        graph.addVertex(new Node(start));
+        graph.addVertex(new Node(close));
+        graph.addVertex(new Node(further));
+        graph.addVertex(new Node(far));
+        graph.addEdge(new Edge(1, start, close), new Node(start), new Node(close), DIRECTED);
+        graph.addEdge(new Edge(2, close, further), new Node(close), new Node(further), DIRECTED);
+        graph.addEdge(new Edge(5, further, far), new Node(further), new Node(far), DIRECTED);
+        // when
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, n -> n.weight);
+        final Predicate<Node> predicate = node -> {
+            if (node.equals(new Node(start))) {
+                return false;
+            }
+            final Number distance = shortestPath.getDistance(new Node(start), node);
+            return distance.intValue() < threshold;
+        };
+        final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
+        final Graph<Node, Edge> transformed = filter.transform(graph);
+        // then
+        assertThat(transformed.getVertices(), containsInAnyOrder(new Node(close), new Node(further)));
     }
 }
