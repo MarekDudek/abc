@@ -135,6 +135,8 @@ public final class ErdosGraphTest {
         // then
         assertThat(fromRemoved, is(true));
         assertThat(edgeExists(graph, vertex(from), vertex(to)), is(false));
+        assertThat(vertexExists(graph, vertex(from)), is(false));
+        assertThat(vertexExists(graph, vertex(to)), is(true));
     }
 
     private static Optional<Edge> findEdge
