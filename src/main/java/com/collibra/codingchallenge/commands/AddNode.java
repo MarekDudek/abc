@@ -9,5 +9,5 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class AddNode implements GraphCommand {
-    private final String node;
+    public final String node;
 }

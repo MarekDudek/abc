@@ -9,6 +9,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class RemoveEdge implements GraphCommand {
-    private final String fromNode;
-    private final String toNode;
+    public final String from;
+    public final String to;
 }

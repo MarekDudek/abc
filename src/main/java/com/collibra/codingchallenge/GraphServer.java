@@ -1,5 +1,6 @@
 package com.collibra.codingchallenge;
 
+import com.collibra.codingchallenge.graphs.GraphManager;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ import static com.collibra.codingchallenge.CollibraConstants.COLLIBRA_PORT;
 public final class GraphServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
+
+    private final GraphManager graph = new GraphManager();
 
     public static void main(final String[] ignored) {
         LOGGER.info("Starting Collibra Graph Server");
@@ -35,7 +38,7 @@ public final class GraphServer {
             final Socket client = server.accept();
             final long started = System.currentTimeMillis();
             client.setSoTimeout(timeout);
-            final ClientHandler handler = new ClientHandler(client, started);
+            final ClientHandler handler = new ClientHandler(client, started, graph);
             new Thread(handler).start();
         }
     }
@@ -45,6 +48,7 @@ public final class GraphServer {
 
         private final Socket socket;
         private final long started;
+        private final GraphManager graph;
         private final UUID sessionID = UUID.randomUUID();
 
         @Override
@@ -57,7 +61,12 @@ public final class GraphServer {
                 for (final String request : protocol.requests()) {
                     final Optional<GraphCommand> command = GraphCommandParser.parse(request);
                     if (command.isPresent()) {
-
+                        final String response = graph.handle(command.get());
+                        if (response == null) {
+                            protocol.apologise();
+                        } else {
+                            protocol.graphCommandResponse(response);
+                        }
                     } else {
                         protocol.apologise();
                     }

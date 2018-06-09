@@ -10,5 +10,5 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class RemoveNode implements GraphCommand {
-    private final String node;
+    public final String node;
 }

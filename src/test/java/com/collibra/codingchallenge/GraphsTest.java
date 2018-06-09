@@ -7,7 +7,7 @@ import static com.collibra.codingchallenge.graphs.Graphs.*;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public final class ErdosGraphTest {
+public final class GraphsTest {
 
     @Test
     public void adding_and_removing_nodes() {

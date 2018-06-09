@@ -101,6 +101,10 @@ final class Protocol implements AutoCloseable {
         };
     }
 
+    void graphCommandResponse(final String response) {
+        server.println(response);
+    }
+
     private static final Pattern INTRODUCTION = Pattern.compile("HI, I'M (.+)", CASE_INSENSITIVE);
 
     static String clientName(final String introduction) {
