@@ -78,5 +78,10 @@ public final class ErdosGraphTest {
         assertThat(edgeExists(graph, node(from), node(to)), is(false));
         assertThat(nodeExists(graph, node(from)), is(false));
         assertThat(nodeExists(graph, node(to)), is(true));
+        // when
+        final boolean toRemoved = removeNode(graph, node(to));
+        // then
+        assertThat(toRemoved, is(true));
+        assertThat(nodeExists(graph, node(to)), is(false));
     }
 }
