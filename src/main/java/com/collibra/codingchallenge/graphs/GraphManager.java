@@ -1,11 +1,11 @@
 package com.collibra.codingchallenge.graphs;
 
-import com.collibra.codingchallenge.GraphCommand;
+import com.collibra.codingchallenge.commands.GraphCommand;
 import com.collibra.codingchallenge.commands.*;
 import com.hendrix.erdos.graphs.AbstractGraph;
 import com.hendrix.erdos.types.IVertex;
 
-import static com.collibra.codingchallenge.GraphCommand.match;
+import static com.collibra.codingchallenge.commands.GraphCommand.match;
 import static com.collibra.codingchallenge.graphs.Graphs.*;
 
 public final class GraphManager {

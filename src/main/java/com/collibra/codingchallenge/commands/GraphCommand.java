@@ -1,10 +1,8 @@
-package com.collibra.codingchallenge;
-
-import com.collibra.codingchallenge.commands.*;
+package com.collibra.codingchallenge.commands;
 
 import java.util.function.Function;
 
-import static com.collibra.codingchallenge.utils.Utils.error;
+import static com.collibra.codingchallenge.utils.Error.error;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public interface GraphCommand {

@@ -1,6 +1,7 @@
 package com.collibra.codingchallenge;
 
 import com.collibra.codingchallenge.commands.*;
+import com.collibra.codingchallenge.graphs.GraphCommandParser;
 import org.junit.Test;
 
 import java.util.Optional;

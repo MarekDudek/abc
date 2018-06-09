@@ -1,5 +1,7 @@
 package com.collibra.codingchallenge;
 
+import com.collibra.codingchallenge.commands.GraphCommand;
+import com.collibra.codingchallenge.graphs.GraphCommandParser;
 import com.collibra.codingchallenge.graphs.GraphManager;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -65,7 +67,7 @@ public final class GraphServer {
                         if (response == null) {
                             protocol.apologise();
                         } else {
-                            protocol.graphCommandResponse(response);
+                            protocol.sendResponse(response);
                         }
                     } else {
                         protocol.apologise();

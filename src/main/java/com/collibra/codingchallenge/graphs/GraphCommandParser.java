@@ -1,4 +1,4 @@
-package com.collibra.codingchallenge;
+package com.collibra.codingchallenge.graphs;
 
 import com.collibra.codingchallenge.commands.*;
 import lombok.AllArgsConstructor;
@@ -12,21 +12,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
-final class GraphCommandParser {
+public final class GraphCommandParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphCommandParser.class);
 
 
-    static Optional<GraphCommand> parse(final String request) {
+    public static Optional<GraphCommand> parse(final String request) {
         final BiFunction<Optional<GraphCommand>, Parser, Optional<GraphCommand>> first =
                 (command, parser) ->
                         command.isPresent()
                                 ? command
                                 : parser.parseAndLog(request);
-        return Stream.of(Parser.values()).reduce(empty(), first, CONST);
+        return Stream.of(Parser.values()).reduce(Optional.empty(), first, CONST);
     }
 
     private static final BinaryOperator<Optional<GraphCommand>> CONST = (a, b) -> a;
@@ -43,9 +40,9 @@ final class GraphCommandParser {
                 if (matcher.matches()) {
                     final String node = matcher.group(1);
                     final GraphCommand command = new AddNode(node);
-                    return of(command);
+                    return Optional.of(command);
                 }
-                return empty();
+                return Optional.empty();
             }
         },
 
@@ -55,14 +52,14 @@ final class GraphCommandParser {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
-                    final String node1 = matcher.group(1);
-                    final String node2 = matcher.group(2);
+                    final String from = matcher.group(1);
+                    final String to = matcher.group(2);
                     final String str = matcher.group(3);
                     final int weight = Integer.parseInt(str);
-                    final GraphCommand command = new AddEdge(node1, node2, weight);
-                    return of(command);
+                    final GraphCommand command = new AddEdge(from, to, weight);
+                    return Optional.of(command);
                 }
-                return empty();
+                return Optional.empty();
             }
         },
 
@@ -74,9 +71,9 @@ final class GraphCommandParser {
                 if (matcher.matches()) {
                     final String node = matcher.group(1);
                     final GraphCommand command = new RemoveNode(node);
-                    return of(command);
+                    return Optional.of(command);
                 }
-                return empty();
+                return Optional.empty();
             }
         },
 
@@ -86,12 +83,12 @@ final class GraphCommandParser {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
-                    final String node1 = matcher.group(1);
-                    final String node2 = matcher.group(2);
-                    final GraphCommand command = new RemoveEdge(node1, node2);
-                    return of(command);
+                    final String from = matcher.group(1);
+                    final String to = matcher.group(2);
+                    final GraphCommand command = new RemoveEdge(from, to);
+                    return Optional.of(command);
                 }
-                return empty();
+                return Optional.empty();
             }
         },
 
@@ -101,12 +98,12 @@ final class GraphCommandParser {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
-                    final String node1 = matcher.group(1);
-                    final String node2 = matcher.group(2);
-                    final GraphCommand command = new ShortestPath(node1, node2);
-                    return of(command);
+                    final String from = matcher.group(1);
+                    final String to = matcher.group(2);
+                    final GraphCommand command = new ShortestPath(from, to);
+                    return Optional.of(command);
                 }
-                return empty();
+                return Optional.empty();
             }
         },
 
@@ -120,9 +117,9 @@ final class GraphCommandParser {
                     final int weight = Integer.parseInt(str);
                     final String node = matcher.group(2);
                     final GraphCommand command = new CloserThan(weight, node);
-                    return of(command);
+                    return Optional.of(command);
                 }
-                return empty();
+                return Optional.empty();
             }
         };
 

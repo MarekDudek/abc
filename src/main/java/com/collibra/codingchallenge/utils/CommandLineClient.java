@@ -1,4 +1,6 @@
-package com.collibra.codingchallenge;
+package com.collibra.codingchallenge.utils;
+
+import com.collibra.codingchallenge.CollibraConstants;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

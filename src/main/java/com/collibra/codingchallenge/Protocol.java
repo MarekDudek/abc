@@ -71,7 +71,6 @@ final class Protocol implements AutoCloseable {
     }
 
     void apologise() {
-
         final String apology = "SORRY, I DIDN'T UNDERSTAND THAT";
         LOGGER.info("apology - '{}'", apology);
         server.println(apology);
@@ -101,7 +100,8 @@ final class Protocol implements AutoCloseable {
         };
     }
 
-    void graphCommandResponse(final String response) {
+    void sendResponse(final String response) {
+        LOGGER.info("response - '{}'", response);
         server.println(response);
     }
 

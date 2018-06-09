@@ -21,7 +21,7 @@ final class Graphs {
     private static final BiPredicate<IVertex, IVertex> NODES_EQUAL =
             (a, b) -> Objects.equals(a.getData(), b.getData());
 
-    private static final QuaterPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGE_EQUALS =
+    private static final QuaterPredicate<Edge, IVertex, IVertex, Optional<Integer>> EDGES_EQUAL =
             (e, from, to, weight) -> {
                 final boolean f = NODES_EQUAL.test(e.getV1(), from);
                 final boolean t = NODES_EQUAL.test(e.getV2(), to);
@@ -43,22 +43,26 @@ final class Graphs {
     }
 
     static boolean addNode(final AbstractGraph graph, final IVertex node) {
-        return findNode(graph, node).map(
-                found -> false
-        ).orElseGet(
-                () -> {
-                    graph.addVertex(node);
-                    return true;
-                }
-        );
+        return findNode(graph, node).
+                map(
+                        found -> false
+                ).
+                orElseGet(
+                        () -> {
+                            graph.addVertex(node);
+                            return true;
+                        }
+                );
     }
 
     static boolean removeNode(final AbstractGraph graph, final IVertex query) {
-        return findNode(graph, query).map(
-                graph::removeVertex
-        ).orElse(
-                false
-        );
+        return findNode(graph, query).
+                map(
+                        graph::removeVertex
+                ).
+                orElse(
+                        false
+                );
     }
 
     @VisibleForTesting
@@ -138,7 +142,7 @@ final class Graphs {
             ) {
         return graph.edges().stream().
                 filter(
-                        e -> EDGE_EQUALS.test(e, from, to, weight)
+                        e -> EDGES_EQUAL.test(e, from, to, weight)
                 ).
                 findFirst();
     }
@@ -151,7 +155,7 @@ final class Graphs {
             ) {
         return graph.edges().stream().
                 filter(
-                        e -> EDGE_EQUALS.test(e, fromQuery, toQuery, Optional.empty())
+                        e -> EDGES_EQUAL.test(e, fromQuery, toQuery, Optional.empty())
                 ).
                 collect(toList());
     }
