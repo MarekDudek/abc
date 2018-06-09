@@ -8,7 +8,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 class Edge {
-    public final String fromName;
-    public final String toName;
     public final int weight;
+    public final String from;
+    public final String to;
 }

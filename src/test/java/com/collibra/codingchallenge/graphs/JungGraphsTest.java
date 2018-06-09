@@ -7,6 +7,7 @@ import org.junit.Test;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -49,36 +50,36 @@ public final class JungGraphsTest {
         // when
         final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
         // then
-        assertThat(graph.containsEdge(new Edge(from, to, weight)), is(false));
-        assertThat(graph.containsEdge(new Edge(from, to, 23)), is(false)); // TODO
+        assertThat(graph.containsEdge(new Edge(weight, from, to)), is(false));
+        assertThat(graph.containsEdge(new Edge(23, from, to)), is(false)); // TODO
         // when
         graph.addVertex(new Node(from));
         graph.addVertex(new Node(to));
-        final boolean added = graph.addEdge(new Edge(from, to, weight), new Node(from), new Node(to), DIRECTED);
+        final boolean added = graph.addEdge(new Edge(weight, from, to), new Node(from), new Node(to), DIRECTED);
         // then
         assertThat(added, is(true));
-        assertThat(graph.containsEdge(new Edge(from, to, weight)), is(true));
+        assertThat(graph.containsEdge(new Edge(weight, from, to)), is(true));
         // when
-        final boolean addedAgain = graph.addEdge(new Edge(from, to, weight), new Node(from), new Node(to), DIRECTED);
+        final boolean addedAgain = graph.addEdge(new Edge(weight, from, to), new Node(from), new Node(to), DIRECTED);
         // then
         assertThat(addedAgain, is(false));
         // when
-        final boolean removed = graph.removeEdge(new Edge(from, to, weight));
+        final boolean removed = graph.removeEdge(new Edge(weight, from, to));
         // then
         assertThat(removed, is(true));
         // when
-        final boolean removedAgain = graph.removeEdge(new Edge(from, to, weight));
+        final boolean removedAgain = graph.removeEdge(new Edge(weight, from, to));
         // then
         assertThat(removedAgain, is(false));
         // when
-        final boolean addedYetAgain = graph.addEdge(new Edge(from, to, weight), new Node(from), new Node(to), DIRECTED);
+        final boolean addedYetAgain = graph.addEdge(new Edge(weight, from, to), new Node(from), new Node(to), DIRECTED);
         // then
         assertThat(addedYetAgain, is(true));
         // when
         final boolean fromRemoved = graph.removeVertex(new Node(from));
         // then
         assertThat(fromRemoved, is(true));
-        assertThat(graph.containsEdge(new Edge(from, to, weight)), is(false));
+        assertThat(graph.containsEdge(new Edge(weight, from, to)), is(false));
         assertThat(graph.containsVertex(new Node(from)), is(false));
         assertThat(graph.containsVertex(new Node(to)), is(true));
         // when
@@ -98,9 +99,9 @@ public final class JungGraphsTest {
         graph.addVertex(new Node(start));
         graph.addVertex(new Node(end));
         graph.addVertex(new Node(other));
-        graph.addEdge(new Edge(start, end, 10), new Node(start), new Node(end), DIRECTED);
-        graph.addEdge(new Edge(start, other, 4), new Node(start), new Node(other), DIRECTED);
-        graph.addEdge(new Edge(other, end, 3), new Node(other), new Node(end), DIRECTED);
+        graph.addEdge(new Edge(10, start, end), new Node(start), new Node(end), DIRECTED);
+        graph.addEdge(new Edge(4, start, other), new Node(start), new Node(other), DIRECTED);
+        graph.addEdge(new Edge(3, other, end), new Node(other), new Node(end), DIRECTED);
         // when
         final DijkstraShortestPath<Node, Edge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
         final Number distance = algorithm.getDistance(new Node(start), new Node(end));
