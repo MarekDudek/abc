@@ -8,6 +8,8 @@ import org.apache.commons.collections15.Predicate;
 import org.junit.Test;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -171,5 +173,43 @@ public final class JungGraphsTest {
         final Graph<Node, Edge> transformed = filter.transform(graph);
         // then
         assertThat(transformed.getVertices(), containsInAnyOrder(new Node(close), new Node(further)));
+    }
+
+    @Test
+    public void closer_than_example() {
+        // given
+        final String mark = "Mark";
+        final String michael = "Michael";
+        final String madeleine = "Madeleine";
+        final String mufasa = "Mufasa";
+        final int threshold = 8;
+        // when
+        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
+        graph.addVertex(new Node(mark));
+        graph.addVertex(new Node(michael));
+        graph.addVertex(new Node(madeleine));
+        graph.addVertex(new Node(mufasa));
+        graph.addEdge(new Edge(5, mark, michael), new Node(mark), new Node(michael), DIRECTED);
+        graph.addEdge(new Edge(2, michael, madeleine), new Node(michael), new Node(madeleine), DIRECTED);
+        graph.addEdge(new Edge(8, madeleine, mufasa), new Node(madeleine), new Node(mufasa), DIRECTED);
+        // when
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
+        final Predicate<Node> predicate =
+                node -> {
+                    if (node.equals(new Node(mark))) {
+                        return false;
+                    }
+                    final Number distance = shortestPath.getDistance(new Node(mark), node);
+                    if (distance == null) {
+                        return false;
+                    }
+                    final int weight = distance.intValue();
+                    return weight < threshold;
+                };
+        final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
+        final Graph<Node, Edge> closer = filter.transform(graph);
+        final String response = closer.getVertices().stream().sorted(comparing(n -> n.name)).map(n -> n.name).collect(joining(","));
+        // then
+        assertThat(response, is("Madeleine,Michael"));
     }
 }

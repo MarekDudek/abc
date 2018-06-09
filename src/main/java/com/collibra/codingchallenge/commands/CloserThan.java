@@ -8,6 +8,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class CloserThan implements GraphCommand {
-    private final int weight;
-    private final String node;
+    public final int weight;
+    public final String node;
 }

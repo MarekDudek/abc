@@ -1,16 +1,23 @@
 package com.collibra.codingchallenge.graphs;
 
 import com.collibra.codingchallenge.commands.*;
+import com.google.common.collect.Ordering;
+import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.Graph;
+import org.apache.commons.collections15.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public final class JungGraphManager implements GraphManager {
@@ -89,9 +96,9 @@ public final class JungGraphManager implements GraphManager {
     private String handleShortestPath(final ShortestPath command) {
         final Node f = new Node(command.from);
         final Node t = new Node(command.to);
-        final DijkstraShortestPath<Node, Edge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
         try {
-            final Number distance = algorithm.getDistance(f, t);
+            final Number distance = shortestPath.getDistance(f, t);
             final int weight = distance == null
                     ? Integer.MAX_VALUE
                     : distance.intValue();
@@ -102,6 +109,23 @@ public final class JungGraphManager implements GraphManager {
     }
 
     private String handleCloserThan(final CloserThan command) {
-        return null;
+        final Node start = new Node(command.node);
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
+        final Predicate<Node> predicate =
+                node -> {
+                    if (node.equals(start)) {
+                        return false;
+                    }
+                    final Number distance = shortestPath.getDistance(start, node);
+                    if (distance == null) {
+                        return false;
+                    }
+                    final int weight = distance.intValue();
+                    return weight < command.weight;
+                };
+        final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
+        final Graph<Node, Edge> closer = filter.transform(graph);
+        final String response = closer.getVertices().stream().sorted(Comparator.comparing(a -> a.name)).map(n -> n.name).collect(joining(","));
+        return response;
     }
 }
