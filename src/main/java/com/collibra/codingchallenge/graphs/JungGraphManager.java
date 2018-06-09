@@ -1,5 +1,6 @@
 package com.collibra.codingchallenge.graphs;
 
+import com.collibra.codingchallenge.Messages;
 import com.collibra.codingchallenge.commands.*;
 import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
@@ -11,11 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.collibra.codingchallenge.Messages.*;
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.lang.String.format;
-import static java.util.Comparator.naturalOrder;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public final class JungGraphManager implements GraphManager {
@@ -27,7 +27,7 @@ public final class JungGraphManager implements GraphManager {
     @Override
     public String handle(final GraphCommand command) {
         synchronized (graph) {
-            LOGGER.info("handling {}", command);
+            LOGGER.info("Handling {}", command);
             return match(
                     command,
                     this::handleAddNode,
@@ -43,66 +43,62 @@ public final class JungGraphManager implements GraphManager {
     private String handleAddNode(final AddNode command) {
         final Node node = new Node(command.node);
         final boolean added = graph.addVertex(node);
-        return added
-                ? "NODE ADDED"
-                : "ERROR: NODE ALREADY EXISTS";
+        return added ? NODE_ADDED : NODE_ALREADY_EXISTS;
     }
 
     private String handleAddEdge(final AddEdge command) {
         final Node from = new Node(command.from);
         final Node to = new Node(command.to);
         if (graph.containsVertex(from) && graph.containsVertex(to)) {
-            final Edge e = new Edge(command.weight, command.from, command.to);
-            if (graph.containsEdge(e)) {
-                LOGGER.warn("{} already exists", e);
+            final Edge edge = new Edge(command.weight, command.from, command.to);
+            if (graph.containsEdge(edge)) {
+                LOGGER.warn("Edge already exists {}", edge);
             } else {
-                graph.addEdge(e, from, to, DIRECTED);
+                graph.addEdge(edge, from, to, DIRECTED);
             }
-            return "EDGE ADDED";
+            return EDGE_ADDED;
         } else {
-            return "ERROR: NODE NOT FOUND";
+            return NODE_NOT_FOUND;
         }
     }
 
     private String handleRemoveNode(final RemoveNode command) {
         final Node node = new Node(command.node);
         final boolean removed = graph.removeVertex(node);
-        return removed
-                ? "NODE REMOVED"
-                : "ERROR: NODE NOT FOUND";
+        return removed ? NODE_REMOVED : NODE_NOT_FOUND;
     }
 
     private String handleRemoveEdge(final RemoveEdge command) {
-        final Node f = new Node(command.from);
-        final Node t = new Node(command.to);
-        if (graph.containsVertex(f) && graph.containsVertex(t)) {
+        final Node from = new Node(command.from);
+        final Node to = new Node(command.to);
+        if (graph.containsVertex(from) && graph.containsVertex(to)) {
             final List<Edge> edges = graph.getEdges().stream().
                     filter(
-                            e -> e.from.equals(command.from) && e.to.equals(command.to)
+                            edge -> edge.from.equals(command.from) && edge.to.equals(command.to)
                     ).collect(toList());
-            for (final Edge e : edges) {
-                if (graph.containsEdge(e)) {
-                    graph.removeEdge(e);
+            for (final Edge edge : edges) {
+                if (graph.containsEdge(edge)) {
+                    graph.removeEdge(edge);
+                } else {
+                    LOGGER.warn("Edge already removed");
                 }
             }
-            return "EDGE REMOVED";
+            return EDGE_REMOVED;
         } else {
-            return "ERROR: NODE NOT FOUND";
+            return NODE_NOT_FOUND;
         }
     }
 
     private String handleShortestPath(final ShortestPath command) {
-        final Node f = new Node(command.from);
-        final Node t = new Node(command.to);
+        final Node from = new Node(command.from);
+        final Node to = new Node(command.to);
         final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
         try {
-            final Number distance = shortestPath.getDistance(f, t);
-            final int weight = distance == null
-                    ? Integer.MAX_VALUE
-                    : distance.intValue();
-            return format("%d", weight);
-        } catch (final IllegalArgumentException e) {
-            return "ERROR: NODE NOT FOUND";
+            final Number distance = shortestPath.getDistance(from, to);
+            final int weight = distance == null ? Integer.MAX_VALUE : distance.intValue();
+            return format(SHORTEST_PATH, weight);
+        } catch (final IllegalArgumentException ignored) {
+            return NODE_NOT_FOUND;
         }
     }
 
@@ -123,19 +119,11 @@ public final class JungGraphManager implements GraphManager {
                         return weight < command.weight;
                     };
             final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
-            final Graph<Node, Edge> closer = filter.transform(graph);
-            return closer.getVertices().stream().
-                    map(
-                            n -> n.name
-                    ).
-                    sorted(
-                            naturalOrder()
-                    ).
-                    collect(
-                            joining(",")
-                    );
+            final Graph<Node, Edge> closerThan = filter.transform(graph);
+            final List<String> nodes = closerThan.getVertices().stream().map(n -> n.name).collect(toList());
+            return Messages.closerThan(nodes);
         } else {
-            return "ERROR: NODE NOT FOUND";
+            return NODE_NOT_FOUND;
         }
     }
 }

@@ -21,7 +21,7 @@ public final class GraphServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
 
-    private final GraphManager graph = new JungGraphManager();
+    private final GraphManager graphManager = new JungGraphManager();
 
     public static void main(final String[] ignored) {
         LOGGER.info("Starting Collibra Graph Server");
@@ -40,16 +40,15 @@ public final class GraphServer {
             LOGGER.info("Waiting for clients ...");
             final Socket client = server.accept();
             client.setSoTimeout(timeout);
-            final ClientHandler handler = new ClientHandler(client, graph);
+            final ClientHandler handler = new ClientHandler(client);
             new Thread(handler).start();
         }
     }
 
     @RequiredArgsConstructor
-    private static class ClientHandler implements Runnable {
+    private class ClientHandler implements Runnable {
 
         private final Socket socket;
-        private final GraphManager graph;
         private final UUID sessionID = UUID.randomUUID();
 
         @Override
@@ -63,10 +62,10 @@ public final class GraphServer {
                 for (final String request : protocol.requests()) {
                     final Optional<GraphCommand> command = GraphCommandParser.parse(request);
                     if (command.isPresent()) {
-                        final String response = graph.handle(command.get());
+                        final String response = graphManager.handle(command.get());
                         protocol.respond(response);
                     } else {
-                        protocol.notSupported();
+                        protocol.notSupportedCommand();
                     }
                 }
             } catch (final IOException e) {

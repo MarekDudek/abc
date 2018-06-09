@@ -67,15 +67,15 @@ final class Protocol implements AutoCloseable {
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
 
-        final String farewell = format(SERVER_FAREWELL, name, duration);
-        LOGGER.info("Server farewell is '{}'", farewell);
-        server.println(farewell);
+        final String message = format(SERVER_FAREWELL, name, duration);
+        LOGGER.info("Server farewell is '{}'", message);
+        server.println(message);
     }
 
-    void notSupported() {
-        final String apology = SERVER_APOLOGY;
-        LOGGER.info("Server apology is '{}'", apology);
-        server.println(apology);
+    void notSupportedCommand() {
+        final String message = SERVER_NOT_SUPPORTED_COMMAND;
+        LOGGER.info("Server 'not supported command' message is '{}'", message);
+        server.println(message);
     }
 
     Iterable<String> requests() {
@@ -89,7 +89,7 @@ final class Protocol implements AutoCloseable {
                 try {
                     request = client.readLine();
                     LOGGER.debug("Client request was '{}'", request);
-                    return !(request == null || Messages.clientEndedSession(request));
+                    return request != null && !Messages.clientEndedSession(request);
                 } catch (final IOException ignored) {
                     return false;
                 }
