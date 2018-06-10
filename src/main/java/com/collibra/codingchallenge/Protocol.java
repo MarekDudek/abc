@@ -17,8 +17,6 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 final class Protocol implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
-
     private final UUID sessionID = UUID.randomUUID();
     private final Socket socket;
 
@@ -118,4 +116,6 @@ final class Protocol implements AutoCloseable {
         server.write(message + SEPARATOR);
         server.flush();
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 }

@@ -17,9 +17,6 @@ import static java.util.stream.Collectors.toList;
 
 public final class GraphOps {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphOps.class);
-
-
     public static Graph<Node, Edge> graph() {
         return new DirectedSparseMultigraph<>();
     }
@@ -68,7 +65,7 @@ public final class GraphOps {
 
         final Edge e = new Edge(weight, start, end);
 
-        if (graph.containsEdge(e)) {
+        if (containsEdge(graph, e)) {
             LOGGER.info("Edge already exists - {}", e);
         } else {
             graph.addEdge(e, node(start), node(end), DIRECTED);
@@ -96,11 +93,11 @@ public final class GraphOps {
             LOGGER.info("No edge between {} and {} end remove", start, end);
         }
 
-        for (final Edge edge : edges) {
-            if (graph.containsEdge(edge)) {
-                graph.removeEdge(edge);
+        for (final Edge e : edges) {
+            if (containsEdge(graph, e)) {
+                graph.removeEdge(e);
             } else {
-                LOGGER.info("Edge already removed - {}", edge);
+                LOGGER.info("Edge already removed - {}", e);
             }
         }
 
@@ -162,4 +159,10 @@ public final class GraphOps {
     static boolean containsNode(final Graph<Node, Edge> graph, final String node) {
         return graph.containsVertex(node(node));
     }
+
+    static boolean containsEdge(final Graph<Node, Edge> graph, final Edge edge) {
+        return graph.containsEdge(edge);
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphOps.class);
 }

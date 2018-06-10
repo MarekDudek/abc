@@ -20,8 +20,6 @@ import static com.collibra.codingchallenge.parsing.Messages.*;
 
 final class GraphManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphManager.class);
-
     private final Graph<Node, Edge> graph = GraphOps.graph();
 
     String handle(final GraphCommand command) {
@@ -87,4 +85,6 @@ final class GraphManager {
         }
         return Messages.closerThan(nodes.get());
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphManager.class);
 }

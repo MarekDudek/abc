@@ -51,14 +51,14 @@ public final class GraphOpsTest {
         // when
         final Graph<Node, Edge> graph = graph();
         // then
-        assertThat(graph.containsEdge(edge(weight, start, end)), is(false));
+        assertThat(containsEdge(graph, edge(weight, start, end)), is(false));
         // when
         addNode(graph, start);
         addNode(graph, end);
         final boolean added = addEdge(graph, weight, start, end);
         // then
         assertThat(added, is(true));
-        assertThat(graph.containsEdge(edge(weight, start, end)), is(true));
+        assertThat(containsEdge(graph, edge(weight, start, end)), is(true));
         // when
         final boolean addedAgain = addEdge(graph, weight, start, end);
         // then
@@ -75,12 +75,12 @@ public final class GraphOpsTest {
         final boolean addedYetAgain = addEdge(graph, weight, start, end);
         // then
         assertThat(addedYetAgain, is(true));
-        assertThat(graph.containsEdge(edge(weight, start, end)), is(true));
+        assertThat(containsEdge(graph, edge(weight, start, end)), is(true));
         // when
         final boolean startRemoved = removeNode(graph, start);
         // then
         assertThat(startRemoved, is(true));
-        assertThat(graph.containsEdge(edge(weight, start, end)), is(false));
+        assertThat(containsEdge(graph, edge(weight, start, end)), is(false));
         assertThat(containsNode(graph, start), is(false));
         assertThat(containsNode(graph, end), is(true));
         // when
@@ -127,7 +127,7 @@ public final class GraphOpsTest {
     public void shortest_path__between_nodes_that_do_not_exist() {
         // given
         final String exists = "exists";
-        final String doesNot = "does not";
+        final String doesNot = "does not exist";
         final Graph<Node, Edge> graph = graph();
         addNode(graph, exists);
         // when
