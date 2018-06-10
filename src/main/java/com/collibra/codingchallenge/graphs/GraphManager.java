@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.collibra.codingchallenge.Messages.*;
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
@@ -71,19 +72,11 @@ public final class GraphManager {
     }
 
     private String handleShortestPath(final ShortestPath command) {
-
-        final Node from = new Node(command.from);
-        final Node to = new Node(command.to);
-
-        if (!graph.containsVertex(from) || !graph.containsVertex(to)) {
+        final Optional<Integer> weight = GraphOps.shortestPath(graph, command.from, command.to);
+        if (!weight.isPresent()) {
             return NODE_NOT_FOUND;
         }
-
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
-        final Number distance = shortestPath.getDistance(from, to);
-        final int weight = distance == null ? Integer.MAX_VALUE : distance.intValue();
-
-        return format(SHORTEST_PATH, weight);
+        return format(SHORTEST_PATH, weight.get());
     }
 
     private String handleCloserThan(final CloserThan command) {

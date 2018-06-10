@@ -1,11 +1,13 @@
 package com.collibra.codingchallenge.graphs;
 
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.util.stream.Collectors.toList;
@@ -105,5 +107,32 @@ final class GraphOps {
         }
 
         return true;
+    }
+
+    static Optional<Integer> shortestPath(final Graph<Node, Edge> graph, final String from, final String to) {
+
+        final Node f = new Node(from);
+
+        if (!graph.containsVertex(f)) {
+            LOGGER.warn("Starting node not found - '{}'", from);
+            return Optional.empty();
+        }
+
+        final Node t = new Node(to);
+
+        if (!graph.containsVertex(t)) {
+            LOGGER.warn("Ending node not found - '{}'", to);
+            return Optional.empty();
+        }
+
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
+        final Number distance = shortestPath.getDistance(f, t);
+        final int weight = nodesConnected(distance) ? distance.intValue() : Integer.MAX_VALUE;
+
+        return Optional.of(weight);
+    }
+
+    private static boolean nodesConnected(final Number distance) {
+        return distance != null;
     }
 }
