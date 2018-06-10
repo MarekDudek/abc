@@ -2,12 +2,8 @@ package com.collibra.codingchallenge.parsing;
 
 import com.collibra.codingchallenge.commands.*;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -17,20 +13,14 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public final class GraphCommandParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphCommandParser.class);
-
-
     public static Optional<GraphCommand> parse(final String request) {
-        final BiFunction<Optional<GraphCommand>, Parser, Optional<GraphCommand>> first =
-                (command, parser) ->
-                        command.isPresent()
-                                ? command
-                                : parser.parseAndLog(request);
-        return Stream.of(Parser.values()).reduce(Optional.empty(), first, CONST); // FIXME: make sure that it exits early
+        return Stream.of(Parser.values()).flatMap(
+                parser -> {
+                    final Optional<GraphCommand> command = parser.parse(request);
+                    return command.map(Stream::of).orElseGet(Stream::empty);
+                }
+        ).findFirst();
     }
-
-    private static final BinaryOperator<Optional<GraphCommand>> CONST = (a, b) -> a;
-
 
     @AllArgsConstructor
     private enum Parser {
@@ -130,10 +120,5 @@ public final class GraphCommandParser {
 
 
         abstract Optional<GraphCommand> parse(String text);
-
-        Optional<GraphCommand> parseAndLog(final String text) { // FIXME: remove it from this enum
-            LOGGER.trace("parsing " + name());
-            return parse(text);
-        }
     }
 }
