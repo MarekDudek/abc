@@ -88,7 +88,7 @@ public final class GraphServer {
         public void run() {
             try {
                 final boolean succeeded = result.get();
-                LOGGER.info("Handling the client succeeded? {}", succeeded);
+                LOGGER.info("Handling the client {}", succeeded ? "succeeded" : "failed");
             } catch (final Exception e) {
                 LOGGER.error("Error while reporting result - {}", e.getMessage());
             }

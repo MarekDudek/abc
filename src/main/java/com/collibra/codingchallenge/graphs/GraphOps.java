@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.toList;
 
 public final class GraphOps {
@@ -166,7 +167,7 @@ public final class GraphOps {
         final VertexPredicateFilter<Node, Edge> nodeFilter = new VertexPredicateFilter<>(closerThanThreshold);
         final Graph<Node, Edge> closerNodes = nodeFilter.transform(graph);
 
-        final List<String> names = closerNodes.getVertices().stream().map(n -> n.name).collect(toList());
+        final List<String> names = closerNodes.getVertices().stream().map(n -> n.name).sorted(naturalOrder()).collect(toList());
 
         return Optional.of(names);
     }

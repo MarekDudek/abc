@@ -7,9 +7,7 @@ import java.util.regex.Pattern;
 
 import static com.collibra.codingchallenge.parsing.Regex.NODE;
 import static com.collibra.codingchallenge.parsing.Regex.s;
-import static java.util.Comparator.naturalOrder;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
-import static java.util.stream.Collectors.joining;
 
 public final class Messages {
 
@@ -54,10 +52,6 @@ public final class Messages {
     }
 
     public static String closerThan(final List<String> names) {
-        return names.stream().sorted(
-                naturalOrder()
-        ).collect(
-                joining(",")
-        );
+        return String.join(",", names);
     }
 }

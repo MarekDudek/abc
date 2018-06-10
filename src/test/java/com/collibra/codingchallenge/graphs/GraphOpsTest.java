@@ -1,19 +1,13 @@
 package com.collibra.codingchallenge.graphs;
 
-import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
-import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
-import org.apache.commons.collections15.Predicate;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.collibra.codingchallenge.graphs.GraphOps.*;
-import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
-import static java.util.Comparator.naturalOrder;
-import static java.util.stream.Collectors.joining;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -143,80 +137,48 @@ public final class GraphOpsTest {
     }
 
     @Test
-    public void closer_than_again() {
+    public void closer_than() {
         // given
         final String start = "start";
         final String close = "close";
         final String further = "further";
         final String far = "far";
-        final int threshold = 5;
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
-        graph.addVertex(new Node(start));
-        graph.addVertex(new Node(close));
-        graph.addVertex(new Node(further));
-        graph.addVertex(new Node(far));
-        graph.addEdge(new Edge(1, start, close), new Node(start), new Node(close), DIRECTED);
-        graph.addEdge(new Edge(2, close, further), new Node(close), new Node(further), DIRECTED);
-        graph.addEdge(new Edge(5, further, far), new Node(further), new Node(far), DIRECTED);
+        final int threshold = 9;
+        final Graph<Node, Edge> graph = graph();
+        addNode(graph, start);
+        addNode(graph, close);
+        addNode(graph, further);
+        addNode(graph, far);
+        addEdge(graph, 2, start, close);
+        addEdge(graph, 3, close, further);
+        addEdge(graph, 4, further, far);
         // when
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, n -> n.weight);
-        final Predicate<Node> predicate = node -> {
-            if (node.equals(new Node(start))) {
-                return false;
-            }
-            final Number distance = shortestPath.getDistance(new Node(start), node);
-            return distance.intValue() < threshold;
-        };
-        final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
-        final Graph<Node, Edge> transformed = filter.transform(graph);
+        final Optional<List<String>> nodes = closerThan(graph, threshold, start);
         // then
-        assertThat(transformed.getVertices(), containsInAnyOrder(new Node(close), new Node(further)));
+        assertThat(nodes.isPresent(), is(true));
+        assertThat(nodes, is(Optional.of(asList(close, further))));
     }
 
     @Test
-    public void closer_than_example() {
+    public void closer_than__collibra_example() {
         // given
         final String mark = "Mark";
         final String michael = "Michael";
         final String madeleine = "Madeleine";
         final String mufasa = "Mufasa";
         final int threshold = 8;
+        final Graph<Node, Edge> graph = graph();
+        addNode(graph, mark);
+        addNode(graph, michael);
+        addNode(graph, madeleine);
+        addNode(graph, mufasa);
+        addEdge(graph, 5, mark, michael);
+        addEdge(graph, 2, michael, madeleine);
+        addEdge(graph, 8, madeleine, mufasa);
         // when
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
-        graph.addVertex(new Node(mark));
-        graph.addVertex(new Node(michael));
-        graph.addVertex(new Node(madeleine));
-        graph.addVertex(new Node(mufasa));
-        graph.addEdge(new Edge(5, mark, michael), new Node(mark), new Node(michael), DIRECTED);
-        graph.addEdge(new Edge(2, michael, madeleine), new Node(michael), new Node(madeleine), DIRECTED);
-        graph.addEdge(new Edge(8, madeleine, mufasa), new Node(madeleine), new Node(mufasa), DIRECTED);
-        // when
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
-        final Predicate<Node> predicate =
-                node -> {
-                    if (node.equals(new Node(mark))) {
-                        return false;
-                    }
-                    final Number distance = shortestPath.getDistance(new Node(mark), node);
-                    if (distance == null) {
-                        return false;
-                    }
-                    final int weight = distance.intValue();
-                    return weight < threshold;
-                };
-        final VertexPredicateFilter<Node, Edge> filter = new VertexPredicateFilter<>(predicate);
-        final Graph<Node, Edge> closer = filter.transform(graph);
-        final String response = closer.getVertices().stream().
-                map(
-                        n -> n.name
-                ).
-                sorted(
-                        naturalOrder()
-                ).
-                collect(
-                        joining(",")
-                );
+        final Optional<List<String>> nodes = closerThan(graph, threshold, mark);
         // then
-        assertThat(response, is("Madeleine,Michael"));
+        assertThat(nodes.isPresent(), is(true));
+        assertThat(nodes, is(Optional.of(asList(madeleine, michael))));
     }
 }
