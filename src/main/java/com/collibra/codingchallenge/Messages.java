@@ -50,8 +50,8 @@ public final class Messages {
     public static final String SHORTEST_PATH = "%d";
 
 
-    public static String closerThan(final List<String> nodes) {
-        return nodes.stream().sorted(
+    public static String closerThan(final List<String> names) {
+        return names.stream().sorted(
                 naturalOrder()
         ).collect(
                 joining(",")
