@@ -72,7 +72,11 @@ public final class GraphServer {
                 LOGGER.error("Client {} on {} failed with message '{}'", sessionID, socket, e.getMessage());
             } finally {
                 if (protocol != null) {
-                    protocol.seeOff();
+                    try {
+                        protocol.seeOff();
+                    } catch (final IOException e) {
+                        LOGGER.error("Error while closing protocol: {}", e.getMessage());
+                    }
                     protocol.close();
                 }
             }

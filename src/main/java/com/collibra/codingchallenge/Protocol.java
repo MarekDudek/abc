@@ -6,10 +6,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.UUID;
@@ -22,19 +19,26 @@ final class Protocol implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
+    private static final Object SEPARATOR = System.getProperty("line.separator");
+
     private final Socket socket;
     private final UUID sessionID;
 
     private BufferedReader client;
-    private PrintWriter server;
+    //private PrintWriter server;
+    //private DataOutputStream server;
+    private OutputStreamWriter server;
+
     private long started;
 
     private String name;
 
     void initialize() throws IOException {
         client = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        server = new PrintWriter(socket.getOutputStream(), true);
+        //server = new PrintWriter(socket.getOutputStream(), true);
+        //server = new DataOutputStream(socket.getOutputStream());
         started = System.currentTimeMillis();
+        server = new OutputStreamWriter(new DataOutputStream(socket.getOutputStream()));
     }
 
     @Override
@@ -47,7 +51,9 @@ final class Protocol implements AutoCloseable {
 
         final String firstMessage = format(SERVER_FIRST_MESSAGE, sessionID);
         LOGGER.info("Server first message is '{}'", firstMessage);
-        server.println(firstMessage);
+        server.write(firstMessage + SEPARATOR);
+        server.flush();
+
 
         final String clientResponse = client.readLine();
         LOGGER.info("Client response was '{}'", clientResponse);
@@ -60,23 +66,26 @@ final class Protocol implements AutoCloseable {
 
         final String serverResponse = format(SERVER_RESPONSE, name);
         LOGGER.info("Server response is '{}'", serverResponse);
-        server.println(serverResponse);
+        server.write(serverResponse + SEPARATOR);
+        server.flush();
     }
 
-    void seeOff() {
+    void seeOff() throws IOException {
 
         final long finished = System.currentTimeMillis();
         final long duration = finished - started;
 
         final String message = format(SERVER_FAREWELL, name, duration);
         LOGGER.info("Server farewell is '{}'", message);
-        server.println(message);
+        server.write(message + SEPARATOR);
+        server.flush();
     }
 
-    void notSupportedCommand() {
+    void notSupportedCommand() throws IOException {
         final String message = SERVER_NOT_SUPPORTED_COMMAND;
         LOGGER.info("Server 'not supported command' message is '{}'", message);
-        server.println(message);
+        server.write(message + SEPARATOR);
+        server.flush();
     }
 
     Iterable<String> requests() {
@@ -103,8 +112,9 @@ final class Protocol implements AutoCloseable {
         };
     }
 
-    void respond(final String response) {
+    void respond(final String response) throws IOException {
         LOGGER.debug("Server response is '{}'", response);
-        server.println(response);
+        server.write(response + SEPARATOR);
+        server.flush();
     }
 }
