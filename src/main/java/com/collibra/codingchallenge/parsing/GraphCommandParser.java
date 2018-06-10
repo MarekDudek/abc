@@ -14,12 +14,13 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 public final class GraphCommandParser {
 
     public static Optional<GraphCommand> parse(final String request) {
-        return Stream.of(Parser.values()).flatMap(
-                parser -> {
-                    final Optional<GraphCommand> command = parser.parse(request);
-                    return command.map(Stream::of).orElseGet(Stream::empty);
-                }
-        ).findFirst();
+        return Stream.of(Parser.values()).
+                flatMap(
+                        parser -> parser.parse(request).
+                                map(Stream::of).
+                                orElseGet(Stream::empty)
+                ).
+                findFirst();
     }
 
     @AllArgsConstructor
