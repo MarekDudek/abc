@@ -22,7 +22,7 @@ final class GraphManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphManager.class);
 
-    private final Graph<Node, Edge> graph = GraphOps.createGraph();
+    private final Graph<Node, Edge> graph = GraphOps.graph();
 
     String handle(final GraphCommand command) {
         synchronized (graph) {
@@ -48,7 +48,7 @@ final class GraphManager {
     }
 
     private String handleAddEdge(final AddEdge command) {
-        final boolean added = addEdge(graph, command.from, command.to, command.weight);
+        final boolean added = addEdge(graph, command.weight, command.from, command.to);
         if (!added) {
             return NODE_NOT_FOUND;
         }

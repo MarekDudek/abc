@@ -7,141 +7,139 @@ import edu.uci.ics.jung.graph.Graph;
 import org.apache.commons.collections15.Predicate;
 import org.junit.Test;
 
+import java.util.Optional;
+
+import static com.collibra.codingchallenge.graphs.GraphOps.*;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public final class GraphOpsTest {
 
     @Test
     public void adding_and_removing_nodes() {
         // given
-        final String id = "node";
+        final String id = "sth";
         // when
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
+        final Graph<Node, Edge> graph = graph();
         // then
-        assertThat(graph.containsVertex(new Node(id)), is(false));
+        assertThat(graph.containsVertex(node(id)), is(false));
         // when
-        final boolean added = graph.addVertex(new Node(id));
+        final boolean added = addNode(graph, id);
         // then
         assertThat(added, is(true));
-        assertThat(graph.containsVertex(new Node(id)), is(true));
+        assertThat(graph.containsVertex(node(id)), is(true));
         // when
-        final boolean addedAgain = graph.addVertex(new Node(id));
+        final boolean addedAgain = addNode(graph, id);
         // then
         assertThat(addedAgain, is(false));
         // when
-        final boolean removed = graph.removeVertex(new Node(id));
+        final boolean removed = removeNode(graph, id);
         // then
         assertThat(removed, is(true));
-        assertThat(graph.containsVertex(new Node(id)), is(false));
+        assertThat(graph.containsVertex(node(id)), is(false));
         // when
-        final boolean removedAgain = graph.removeVertex(new Node(id));
+        final boolean removedAgain = removeNode(graph, id);
         // then
         assertThat(removedAgain, is(false));
     }
 
+
     @Test
     public void adding_and_removing_edges() {
         // given
-        final String from = "from";
-        final String to = "to";
+        final String start = "start";
+        final String end = "end";
         final int weight = 10;
         // when
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
+        final Graph<Node, Edge> graph = graph();
         // then
-        assertThat(graph.containsEdge(new Edge(weight, from, to)), is(false));
-        assertThat(graph.containsEdge(new Edge(23, from, to)), is(false)); // TODO
+        assertThat(graph.containsEdge(edge(weight, start, end)), is(false));
         // when
-        graph.addVertex(new Node(from));
-        graph.addVertex(new Node(to));
-        final boolean added = graph.addEdge(new Edge(weight, from, to), new Node(from), new Node(to), DIRECTED);
+        addNode(graph, start);
+        addNode(graph, end);
+        final boolean added = addEdge(graph, weight, start, end);
         // then
         assertThat(added, is(true));
-        assertThat(graph.containsEdge(new Edge(weight, from, to)), is(true));
+        assertThat(graph.containsEdge(edge(weight, start, end)), is(true));
         // when
-        final boolean addedAgain = graph.addEdge(new Edge(weight, from, to), new Node(from), new Node(to), DIRECTED);
+        final boolean addedAgain = addEdge(graph, weight, start, end);
         // then
-        assertThat(addedAgain, is(false));
+        assertThat(addedAgain, is(true));
         // when
-        final boolean removed = graph.removeEdge(new Edge(weight, from, to));
+        final boolean removed = removeEdge(graph, start, end);
         // then
         assertThat(removed, is(true));
         // when
-        final boolean removedAgain = graph.removeEdge(new Edge(weight, from, to));
+        final boolean removedAgain = removeEdge(graph, start, end);
         // then
-        assertThat(removedAgain, is(false));
+        assertThat(removedAgain, is(true));
         // when
-        final boolean addedYetAgain = graph.addEdge(new Edge(weight, from, to), new Node(from), new Node(to), DIRECTED);
+        final boolean addedYetAgain = addEdge(graph, weight, start, end);
         // then
         assertThat(addedYetAgain, is(true));
+        assertThat(graph.containsEdge(edge(weight, start, end)), is(true));
         // when
-        final boolean fromRemoved = graph.removeVertex(new Node(from));
+        final boolean startRemoved = removeNode(graph, start);
         // then
-        assertThat(fromRemoved, is(true));
-        assertThat(graph.containsEdge(new Edge(weight, from, to)), is(false));
-        assertThat(graph.containsVertex(new Node(from)), is(false));
-        assertThat(graph.containsVertex(new Node(to)), is(true));
+        assertThat(startRemoved, is(true));
+        assertThat(graph.containsEdge(edge(weight, start, end)), is(false));
+        assertThat(graph.containsVertex(node(start)), is(false));
+        assertThat(graph.containsVertex(node(end)), is(true));
         // when
-        final boolean toRemoved = graph.removeVertex(new Node(to));
+        final boolean endRemoved = removeNode(graph, end);
         // then
-        assertThat(toRemoved, is(true));
-        assertThat(graph.containsVertex(new Node(to)), is(false));
+        assertThat(endRemoved, is(true));
+        assertThat(graph.containsVertex(node(end)), is(false));
     }
 
     @Test
     public void shortest_path() {
         // given
         final String start = "start";
+        final String middle = "middle";
         final String end = "end";
-        final String other = "other";
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
-        graph.addVertex(new Node(start));
-        graph.addVertex(new Node(end));
-        graph.addVertex(new Node(other));
-        graph.addEdge(new Edge(10, start, end), new Node(start), new Node(end), DIRECTED);
-        graph.addEdge(new Edge(4, start, other), new Node(start), new Node(other), DIRECTED);
-        graph.addEdge(new Edge(3, other, end), new Node(other), new Node(end), DIRECTED);
+        final Graph<Node, Edge> graph = graph();
+        addNode(graph, start);
+        addNode(graph, middle);
+        addNode(graph, end);
+        addEdge(graph, 10, start, end);
+        addEdge(graph, 4, start, middle);
+        addEdge(graph, 3, middle, end);
         // when
-        final DijkstraShortestPath<Node, Edge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
-        final Number distance = algorithm.getDistance(new Node(start), new Node(end));
+        final Optional<Integer> weight = shortestPath(graph, start, end);
         // then
-        assertThat(distance, is(7.0));
+        assertThat(weight, is(Optional.of(7)));
     }
 
     @Test
-    public void shortest_path__no_connection() {
+    public void shortest_path__between_not_connected_nodes() {
         // given
-        final String a = "a";
-        final String b = "b";
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
-        graph.addVertex(new Node(a));
-        graph.addVertex(new Node(b));
+        final String island = "island";
+        final String continent = "continent";
+        final Graph<Node, Edge> graph = graph();
+        addNode(graph, island);
+        addNode(graph, continent);
         // when
-        final DijkstraShortestPath<Node, Edge> algorithm = new DijkstraShortestPath<>(graph, n -> n.weight);
-        final Number distance = algorithm.getDistance(new Node(a), new Node(b));
+        final Optional<Integer> weight = shortestPath(graph, island, continent);
         // then
-        assertThat(distance, nullValue());
+        assertThat(weight, is(Optional.of(Integer.MAX_VALUE)));
     }
 
     @Test
-    public void shortest_path__node_not_found() {
+    public void shortest_path__between_nodes_that_do_not_exist() {
         // given
-        final String a = "a";
-        final String b = "b";
-        final DirectedSparseMultigraph<Node, Edge> graph = new DirectedSparseMultigraph<>();
-        graph.addVertex(new Node(a));
+        final String exists = "exists";
+        final String doesNot = "does not";
+        final Graph<Node, Edge> graph = graph();
+        addNode(graph, exists);
         // when
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, n -> n.weight);
-        try {
-            shortestPath.getDistance(new Node(a), new Node(b));
-            fail();
-        } catch (final IllegalArgumentException ignored) {
-        }
+        final Optional<Integer> weight = shortestPath(graph, exists, doesNot);
         // then
+        assertThat(weight.isPresent(), is(false));
     }
 
     @Test

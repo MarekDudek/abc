@@ -19,10 +19,17 @@ public final class GraphOps {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphOps.class);
 
 
-    public static Graph<Node, Edge> createGraph() {
+    public static Graph<Node, Edge> graph() {
         return new DirectedSparseMultigraph<>();
     }
 
+    public static Node node(final String id) {
+        return new Node(id);
+    }
+
+    public static Edge edge(final int weight, final String start, final String end) {
+        return new Edge(weight, start, end);
+    }
 
     public static boolean addNode(final Graph<Node, Edge> graph, final String node) {
 
@@ -49,7 +56,7 @@ public final class GraphOps {
     }
 
 
-    public static boolean addEdge(final Graph<Node, Edge> graph, final String from, final String to, final int weight) {
+    public static boolean addEdge(final Graph<Node, Edge> graph, final int weight, final String from, final String to) {
 
         final Node f = new Node(from);
 
