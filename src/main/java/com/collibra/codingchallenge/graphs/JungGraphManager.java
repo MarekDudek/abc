@@ -92,12 +92,12 @@ public final class JungGraphManager implements GraphManager {
     private String handleShortestPath(final ShortestPath command) {
         final Node from = new Node(command.from);
         final Node to = new Node(command.to);
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
-        try {
+        if (graph.containsVertex(from) && graph.containsVertex(to)) {
+            final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
             final Number distance = shortestPath.getDistance(from, to);
             final int weight = distance == null ? Integer.MAX_VALUE : distance.intValue();
             return format(SHORTEST_PATH, weight);
-        } catch (final IllegalArgumentException ignored) {
+        } else {
             return NODE_NOT_FOUND;
         }
     }
