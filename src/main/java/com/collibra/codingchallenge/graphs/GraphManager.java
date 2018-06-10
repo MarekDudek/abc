@@ -38,61 +38,34 @@ public final class GraphManager {
     }
 
     private String handleAddNode(final AddNode command) {
-
         final boolean added = GraphOps.addNode(graph, command.node);
-
         if (!added) {
-            LOGGER.warn("Node already exists - {}", command.node);
             return NODE_ALREADY_EXISTS;
         }
-
         return NODE_ADDED;
     }
 
     private String handleAddEdge(final AddEdge command) {
-
         final boolean added = GraphOps.addEdge(graph, command.from, command.to, command.weight);
-
         if (!added) {
             return NODE_NOT_FOUND;
         }
-
         return EDGE_ADDED;
     }
 
     private String handleRemoveNode(final RemoveNode command) {
-
         final boolean removed = GraphOps.removeNode(graph, command.node);
-
         if (!removed) {
-            LOGGER.warn("Node not found - {}", command.node);
             return NODE_NOT_FOUND;
         }
-
         return NODE_REMOVED;
     }
 
     private String handleRemoveEdge(final RemoveEdge command) {
-
-        final Node from = new Node(command.from);
-        final Node to = new Node(command.to);
-
-        if (!graph.containsVertex(from) || !graph.containsVertex(to)) {
+        final boolean removed = GraphOps.removeEdge(graph, command.from, command.to);
+        if (!removed) {
             return NODE_NOT_FOUND;
         }
-
-        final List<Edge> edges = graph.getEdges().stream().filter(
-                edge -> edge.from.equals(command.from) && edge.to.equals(command.to)
-        ).collect(toList());
-
-        for (final Edge edge : edges) {
-            if (graph.containsEdge(edge)) {
-                graph.removeEdge(edge);
-            } else {
-                LOGGER.warn("Edge already removed - {}", edge);
-            }
-        }
-
         return EDGE_REMOVED;
 
     }

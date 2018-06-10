@@ -5,7 +5,10 @@ import edu.uci.ics.jung.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
+import static java.util.stream.Collectors.toList;
 
 final class GraphOps {
 
@@ -17,30 +20,44 @@ final class GraphOps {
 
 
     static boolean addNode(final Graph<Node, Edge> graph, final String node) {
+
         final Node n = new Node(node);
-        return graph.addVertex(n);
+        final boolean added = graph.addVertex(n);
+
+        if (!added) {
+            LOGGER.warn("Node not added - {}", n);
+        }
+
+        return added;
     }
 
     static boolean removeNode(final Graph<Node, Edge> graph, final String node) {
+
         final Node n = new Node(node);
-        return graph.removeVertex(n);
+
+        final boolean removed = graph.removeVertex(n);
+
+        if (!removed) {
+            LOGGER.warn("Node not removed - {}", n);
+        }
+
+        return removed;
     }
 
-    
+
     static boolean addEdge(final Graph<Node, Edge> graph, final String from, final String to, final int weight) {
 
         final Node f = new Node(from);
+
+        if (!graph.containsVertex(f)) {
+            LOGGER.warn("Starting node not found - '{}'", from);
+            return false;
+        }
+
         final Node t = new Node(to);
 
-        if (!graph.containsVertex(f) || !graph.containsVertex(t)) {
-
-            if (!graph.containsVertex(f)) {
-                LOGGER.warn("Starting node not found - '{}'", from);
-            }
-            if (!graph.containsVertex(f)) {
-                LOGGER.warn("Ending node not found - '{}'", to);
-            }
-
+        if (!graph.containsVertex(t)) {
+            LOGGER.warn("Ending node not found - '{}'", to);
             return false;
         }
 
@@ -50,6 +67,41 @@ final class GraphOps {
             LOGGER.warn("Edge already exists - {}", e);
         } else {
             graph.addEdge(e, f, t, DIRECTED);
+        }
+
+        return true;
+    }
+
+    static boolean removeEdge(final Graph<Node, Edge> graph, final String from, final String to) {
+
+        final Node f = new Node(from);
+
+        if (!graph.containsVertex(f)) {
+            LOGGER.warn("Starting node not found - '{}'", from);
+            return false;
+        }
+
+        final Node t = new Node(to);
+
+        if (!graph.containsVertex(t)) {
+            LOGGER.warn("Ending node not found - '{}'", to);
+            return false;
+        }
+
+        final List<Edge> edges = graph.getEdges().stream().filter(
+                edge -> edge.from.equals(from) && edge.to.equals(to)
+        ).collect(toList());
+
+        if (edges.isEmpty()) {
+            LOGGER.warn("No edge between {} and {} to remove", f, t);
+        }
+
+        for (final Edge edge : edges) {
+            if (graph.containsEdge(edge)) {
+                graph.removeEdge(edge);
+            } else {
+                LOGGER.warn("Edge already removed - {}", edge);
+            }
         }
 
         return true;
