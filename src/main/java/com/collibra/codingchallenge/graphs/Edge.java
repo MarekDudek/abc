@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class Edge {
     public final int weight;
-    public final String from;
-    public final String to;
+    public final String start;
+    public final String end;
 }

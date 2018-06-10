@@ -23,10 +23,10 @@ public final class GraphCommandParserTest {
     @Test
     public void add_edge() {
         // when
-        final Optional<GraphCommand> command = GraphCommandParser.parse("ADD EDGE from to 23");
+        final Optional<GraphCommand> command = GraphCommandParser.parse("ADD EDGE start end 23");
         // then
         assertTrue(command.isPresent());
-        assertThat(command.get(), is(new AddEdge("from", "to", 23)));
+        assertThat(command.get(), is(new AddEdge("start", "end", 23)));
     }
 
     @Test
@@ -41,19 +41,19 @@ public final class GraphCommandParserTest {
     @Test
     public void remove_edge() {
         // when
-        final Optional<GraphCommand> command = GraphCommandParser.parse("REMOVE EDGE from to");
+        final Optional<GraphCommand> command = GraphCommandParser.parse("REMOVE EDGE start end");
         // then
         assertTrue(command.isPresent());
-        assertThat(command.get(), is(new RemoveEdge("from", "to")));
+        assertThat(command.get(), is(new RemoveEdge("start", "end")));
     }
 
     @Test
     public void shortest_path() {
         // when
-        final Optional<GraphCommand> command = GraphCommandParser.parse("SHORTEST PATH from to");
+        final Optional<GraphCommand> command = GraphCommandParser.parse("SHORTEST PATH start end");
         // then
         assertTrue(command.isPresent());
-        assertThat(command.get(), is(new ShortestPath("from", "to")));
+        assertThat(command.get(), is(new ShortestPath("start", "end")));
     }
 
     @Test

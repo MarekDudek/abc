@@ -46,11 +46,11 @@ public final class GraphCommandParser {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
-                    final String from = matcher.group(1);
-                    final String to = matcher.group(2);
+                    final String start = matcher.group(1);
+                    final String end = matcher.group(2);
                     final String str = matcher.group(3);
                     final int weight = Integer.parseInt(str);
-                    final GraphCommand command = new AddEdge(from, to, weight);
+                    final GraphCommand command = new AddEdge(start, end, weight);
                     return Optional.of(command);
                 }
                 return Optional.empty();
@@ -77,9 +77,9 @@ public final class GraphCommandParser {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
-                    final String from = matcher.group(1);
-                    final String to = matcher.group(2);
-                    final GraphCommand command = new RemoveEdge(from, to);
+                    final String start = matcher.group(1);
+                    final String end = matcher.group(2);
+                    final GraphCommand command = new RemoveEdge(start, end);
                     return Optional.of(command);
                 }
                 return Optional.empty();
@@ -92,9 +92,9 @@ public final class GraphCommandParser {
             Optional<GraphCommand> parse(final String text) {
                 final Matcher matcher = pattern.matcher(text);
                 if (matcher.matches()) {
-                    final String from = matcher.group(1);
-                    final String to = matcher.group(2);
-                    final GraphCommand command = new ShortestPath(from, to);
+                    final String start = matcher.group(1);
+                    final String end = matcher.group(2);
+                    final GraphCommand command = new ShortestPath(start, end);
                     return Optional.of(command);
                 }
                 return Optional.empty();

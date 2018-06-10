@@ -48,7 +48,7 @@ final class GraphManager {
     }
 
     private String handleAddEdge(final AddEdge command) {
-        final boolean added = addEdge(graph, command.weight, command.from, command.to);
+        final boolean added = addEdge(graph, command.weight, command.start, command.end);
         if (!added) {
             return NODE_NOT_FOUND;
         }
@@ -64,7 +64,7 @@ final class GraphManager {
     }
 
     private String handleRemoveEdge(final RemoveEdge command) {
-        final boolean removed = removeEdge(graph, command.from, command.to);
+        final boolean removed = removeEdge(graph, command.start, command.end);
         if (!removed) {
             return NODE_NOT_FOUND;
         }
@@ -73,7 +73,7 @@ final class GraphManager {
     }
 
     private String handleShortestPath(final ShortestPath command) {
-        final Optional<Integer> weight = shortestPath(graph, command.from, command.to);
+        final Optional<Integer> weight = shortestPath(graph, command.start, command.end);
         if (!weight.isPresent()) {
             return NODE_NOT_FOUND;
         }

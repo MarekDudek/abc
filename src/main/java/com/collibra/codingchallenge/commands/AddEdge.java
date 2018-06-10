@@ -8,7 +8,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class AddEdge implements GraphCommand {
-    public final String from;
-    public final String to;
+    public final String start;
+    public final String end;
     public final int weight;
 }
