@@ -30,11 +30,15 @@ public final class GraphServer {
     private void start(final int port, final int timeout) {
         try (final ServerSocket s = new ServerSocket(port)) {
             while (true) {
-                LOGGER.info("Waiting for clients ...");
-                final Socket c = s.accept();
-                c.setSoTimeout(timeout);
-                final ClientHandler h = new ClientHandler(c);
-                new Thread(h).start();
+                try {
+                    LOGGER.info("Waiting for clients ...");
+                    final Socket c = s.accept();
+                    c.setSoTimeout(timeout);
+                    final ClientHandler h = new ClientHandler(c);
+                    new Thread(h).start();
+                } catch (final IOException e) {
+                    LOGGER.error("Error while handling client - {}", e.getMessage());
+                }
             }
         } catch (final IOException e) {
             LOGGER.error("Could not start the server - {}", e.getMessage());
@@ -44,7 +48,7 @@ public final class GraphServer {
 
     @RequiredArgsConstructor
     private class ClientHandler implements Runnable {
-
+        
         private final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
 
         private final Socket socket;
