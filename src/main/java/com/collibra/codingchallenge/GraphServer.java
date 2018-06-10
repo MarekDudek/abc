@@ -2,6 +2,9 @@ package com.collibra.codingchallenge;
 
 import com.collibra.codingchallenge.commands.GraphCommand;
 import com.collibra.codingchallenge.parsing.GraphCommandParser;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,8 @@ public final class GraphServer {
     }
 
     private void start(final int port, final int timeout) {
-        final ExecutorService service = Executors.newFixedThreadPool(50);
+        final ExecutorService pool = Executors.newFixedThreadPool(50);
+        final ListeningExecutorService service = MoreExecutors.listeningDecorator(pool);
         try (final ServerSocket server = new ServerSocket(port)) {
             while (true) {
                 try {
@@ -36,7 +40,8 @@ public final class GraphServer {
                     final Socket client = server.accept();
                     client.setSoTimeout(timeout);
                     final Callable<Boolean> task = new ClientHandler(client);
-                    service.submit(task);
+                    final ListenableFuture<Boolean> result = service.submit(task);
+                    result.addListener(new ResultReporter(result), service);
                 } catch (final IOException e) {
                     LOGGER.error("Error while handling client - {}", e.getMessage());
                 }
@@ -72,8 +77,22 @@ public final class GraphServer {
             }
             return true;
         }
+    }
 
-        private final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
+    @RequiredArgsConstructor
+    private class ResultReporter implements Runnable {
+
+        final ListenableFuture<Boolean> result;
+
+        @Override
+        public void run() {
+            try {
+                final boolean succeeded = result.get();
+                LOGGER.info("Handling the client succeeded? {}", succeeded);
+            } catch (final Exception e) {
+                LOGGER.error("Error while reporting result - {}", e.getMessage());
+            }
+        }
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
