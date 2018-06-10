@@ -7,7 +7,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-class Edge {
+public class Edge {
     public final int weight;
     public final String from;
     public final String to;

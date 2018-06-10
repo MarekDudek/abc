@@ -1,7 +1,10 @@
-package com.collibra.codingchallenge.graphs;
+package com.collibra.codingchallenge;
 
-import com.collibra.codingchallenge.Messages;
 import com.collibra.codingchallenge.commands.*;
+import com.collibra.codingchallenge.graphs.Edge;
+import com.collibra.codingchallenge.graphs.GraphOps;
+import com.collibra.codingchallenge.graphs.Node;
+import com.collibra.codingchallenge.parsing.Messages;
 import edu.uci.ics.jung.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,19 +12,19 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 
-import static com.collibra.codingchallenge.Messages.*;
+import static com.collibra.codingchallenge.parsing.Messages.*;
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
 import static java.lang.String.format;
 
-public final class GraphManager {
+final class GraphManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphManager.class);
 
     private final Graph<Node, Edge> graph = GraphOps.createGraph();
 
-    public String handle(final GraphCommand command) {
+    String handle(final GraphCommand command) {
         synchronized (graph) {
-            LOGGER.info("Handling {}", command);
+            LOGGER.debug("Handling {}", command);
             return match(
                     command,
                     this::handleAddNode,

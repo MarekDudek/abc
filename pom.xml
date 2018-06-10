@@ -62,13 +62,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- general -->
         <dependency>
@@ -100,16 +93,6 @@
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-algorithms</artifactId>
-            <version>${jung.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-jai</artifactId>
-            <version>${jung.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-io</artifactId>
             <version>${jung.version}</version>
         </dependency>
         <!-- logging -->

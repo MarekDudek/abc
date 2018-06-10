@@ -7,6 +7,6 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-class Node {
+public class Node {
     public final String name;
 }

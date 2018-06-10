@@ -1,5 +1,6 @@
 package com.collibra.codingchallenge;
 
+import com.collibra.codingchallenge.parsing.Messages;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import java.net.Socket;
 import java.util.Iterator;
 import java.util.UUID;
 
-import static com.collibra.codingchallenge.Messages.*;
+import static com.collibra.codingchallenge.parsing.Messages.*;
 import static java.lang.String.format;
 
 @RequiredArgsConstructor

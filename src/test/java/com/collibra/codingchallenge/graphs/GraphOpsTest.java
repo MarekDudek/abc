@@ -8,14 +8,13 @@ import org.apache.commons.collections15.Predicate;
 import org.junit.Test;
 
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
-import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public final class JungGraphsTest {
+public final class GraphOpsTest {
 
     @Test
     public void adding_and_removing_nodes() {

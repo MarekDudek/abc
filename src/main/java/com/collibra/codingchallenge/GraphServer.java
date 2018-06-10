@@ -1,8 +1,7 @@
 package com.collibra.codingchallenge;
 
 import com.collibra.codingchallenge.commands.GraphCommand;
-import com.collibra.codingchallenge.graphs.GraphCommandParser;
-import com.collibra.codingchallenge.graphs.GraphManager;
+import com.collibra.codingchallenge.parsing.GraphCommandParser;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +29,12 @@ public final class GraphServer {
             LOGGER.error("I/O error: " + e.getMessage());
             System.exit(1);
         }
-        LOGGER.info("Collibra Graph Server finished");
+        LOGGER.info("Collibra Graph Server finished"); // FIXME: handle graceful closing
     }
 
     private void start(final int port, final int timeout) throws IOException {
         final ServerSocket server = new ServerSocket(port);
-        while (true) {
+        while (true) { // FIXME: handle closing of server
             LOGGER.info("Waiting for clients ...");
             final Socket client = server.accept();
             client.setSoTimeout(timeout);
@@ -47,13 +46,15 @@ public final class GraphServer {
     @RequiredArgsConstructor
     private class ClientHandler implements Runnable {
 
+        private final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
+
         private final Socket socket;
-        private final UUID sessionID = UUID.randomUUID();
+        private final UUID sessionID = UUID.randomUUID(); // FIXME: move to protocol
 
         @Override
         public void run() {
             LOGGER.info("Client {} on {} started", sessionID, socket);
-            Protocol protocol = null;
+            Protocol protocol = null; // FIXME: use try-with-resources to simplify
             try {
                 protocol = new Protocol(socket, sessionID);
                 protocol.initialize();

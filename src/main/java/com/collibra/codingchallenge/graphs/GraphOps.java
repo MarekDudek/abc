@@ -14,60 +14,60 @@ import java.util.Optional;
 import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.util.stream.Collectors.toList;
 
-final class GraphOps {
+public final class GraphOps {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphOps.class);
 
-    static Graph<Node, Edge> createGraph() {
+    public static Graph<Node, Edge> createGraph() {
         return new DirectedSparseMultigraph<>();
     }
 
 
-    static boolean addNode(final Graph<Node, Edge> graph, final String node) {
+    public static boolean addNode(final Graph<Node, Edge> graph, final String node) {
 
         final Node n = new Node(node);
         final boolean added = graph.addVertex(n);
 
         if (!added) {
-            LOGGER.warn("Node not added - {}", n);
+            LOGGER.info("Node not added - {}", n);
         }
 
         return added;
     }
 
-    static boolean removeNode(final Graph<Node, Edge> graph, final String node) {
+    public static boolean removeNode(final Graph<Node, Edge> graph, final String node) {
 
         final Node n = new Node(node);
         final boolean removed = graph.removeVertex(n);
 
         if (!removed) {
-            LOGGER.warn("Node not removed - {}", n);
+            LOGGER.info("Node not removed - {}", n);
         }
 
         return removed;
     }
 
 
-    static boolean addEdge(final Graph<Node, Edge> graph, final String from, final String to, final int weight) {
+    public static boolean addEdge(final Graph<Node, Edge> graph, final String from, final String to, final int weight) {
 
         final Node f = new Node(from);
 
         if (!graph.containsVertex(f)) {
-            LOGGER.warn("Starting node not found - '{}'", from);
+            LOGGER.info("Starting node not found - '{}'", from);
             return false;
         }
 
         final Node t = new Node(to);
 
         if (!graph.containsVertex(t)) {
-            LOGGER.warn("Ending node not found - '{}'", to);
+            LOGGER.info("Ending node not found - '{}'", to);
             return false;
         }
 
         final Edge e = new Edge(weight, from, to);
 
         if (graph.containsEdge(e)) {
-            LOGGER.warn("Edge already exists - {}", e);
+            LOGGER.info("Edge already exists - {}", e);
         } else {
             graph.addEdge(e, f, t, DIRECTED);
         }
@@ -75,19 +75,19 @@ final class GraphOps {
         return true;
     }
 
-    static boolean removeEdge(final Graph<Node, Edge> graph, final String from, final String to) {
+    public static boolean removeEdge(final Graph<Node, Edge> graph, final String from, final String to) {
 
         final Node f = new Node(from);
 
         if (!graph.containsVertex(f)) {
-            LOGGER.warn("Starting node not found - '{}'", from);
+            LOGGER.info("Starting node not found - '{}'", from);
             return false;
         }
 
         final Node t = new Node(to);
 
         if (!graph.containsVertex(t)) {
-            LOGGER.warn("Ending node not found - '{}'", to);
+            LOGGER.info("Ending node not found - '{}'", to);
             return false;
         }
 
@@ -96,14 +96,14 @@ final class GraphOps {
         ).collect(toList());
 
         if (edges.isEmpty()) {
-            LOGGER.warn("No edge between {} and {} to remove", f, t);
+            LOGGER.info("No edge between {} and {} to remove", f, t);
         }
 
         for (final Edge edge : edges) {
             if (graph.containsEdge(edge)) {
                 graph.removeEdge(edge);
             } else {
-                LOGGER.warn("Edge already removed - {}", edge);
+                LOGGER.info("Edge already removed - {}", edge);
             }
         }
 
@@ -111,19 +111,19 @@ final class GraphOps {
     }
 
 
-    static Optional<Integer> shortestPath(final Graph<Node, Edge> graph, final String from, final String to) {
+    public static Optional<Integer> shortestPath(final Graph<Node, Edge> graph, final String from, final String to) {
 
         final Node f = new Node(from);
 
         if (!graph.containsVertex(f)) {
-            LOGGER.warn("Starting node not found - '{}'", from);
+            LOGGER.info("Starting node not found - '{}'", from);
             return Optional.empty();
         }
 
         final Node t = new Node(to);
 
         if (!graph.containsVertex(t)) {
-            LOGGER.warn("Ending node not found - '{}'", to);
+            LOGGER.info("Ending node not found - '{}'", to);
             return Optional.empty();
         }
 
@@ -134,11 +134,12 @@ final class GraphOps {
         return Optional.of(weight);
     }
 
-    static Optional<List<String>> closerThan(final Graph<Node, Edge> graph, final int threshold, final String from) {
+    public static Optional<List<String>> closerThan(final Graph<Node, Edge> graph, final int threshold, final String from) {
 
         final Node f = new Node(from);
 
         if (!graph.containsVertex(f)) {
+            LOGGER.info("Starting node not found - '{}'", from);
             return Optional.empty();
         }
 

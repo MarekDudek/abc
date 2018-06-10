@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-import static com.collibra.codingchallenge.Messages.nodeName;
+import static com.collibra.codingchallenge.parsing.Messages.nodeName;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
