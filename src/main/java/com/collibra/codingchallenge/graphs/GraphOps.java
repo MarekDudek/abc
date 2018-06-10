@@ -1,8 +1,10 @@
 package com.collibra.codingchallenge.graphs;
 
+import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
+import org.apache.commons.collections15.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,6 @@ final class GraphOps {
     static boolean removeNode(final Graph<Node, Edge> graph, final String node) {
 
         final Node n = new Node(node);
-
         final boolean removed = graph.removeVertex(n);
 
         if (!removed) {
@@ -109,6 +110,7 @@ final class GraphOps {
         return true;
     }
 
+
     static Optional<Integer> shortestPath(final Graph<Node, Edge> graph, final String from, final String to) {
 
         final Node f = new Node(from);
@@ -130,6 +132,34 @@ final class GraphOps {
         final int weight = nodesConnected(distance) ? distance.intValue() : Integer.MAX_VALUE;
 
         return Optional.of(weight);
+    }
+
+    static Optional<List<String>> closerThan(final Graph<Node, Edge> graph, final int threshold, final String from) {
+
+        final Node f = new Node(from);
+
+        if (!graph.containsVertex(f)) {
+            return Optional.empty();
+        }
+
+        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
+
+        final Predicate<Node> keepNode =
+                n -> {
+                    if (n.equals(f)) {
+                        return false;
+                    }
+                    final Number distance = shortestPath.getDistance(f, n);
+                    final int weight = nodesConnected(distance) ? distance.intValue() : Integer.MAX_VALUE;
+                    return weight < threshold;
+                };
+
+        final VertexPredicateFilter<Node, Edge> nodeFilter = new VertexPredicateFilter<>(keepNode);
+        final Graph<Node, Edge> closerThan = nodeFilter.transform(graph);
+
+        final List<String> names = closerThan.getVertices().stream().map(n -> n.name).collect(toList());
+
+        return Optional.of(names);
     }
 
     private static boolean nodesConnected(final Number distance) {

@@ -2,10 +2,7 @@ package com.collibra.codingchallenge.graphs;
 
 import com.collibra.codingchallenge.Messages;
 import com.collibra.codingchallenge.commands.*;
-import edu.uci.ics.jung.algorithms.filters.VertexPredicateFilter;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Graph;
-import org.apache.commons.collections15.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +12,6 @@ import java.util.Optional;
 import static com.collibra.codingchallenge.Messages.*;
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 
 public final class GraphManager {
 
@@ -80,33 +76,10 @@ public final class GraphManager {
     }
 
     private String handleCloserThan(final CloserThan command) {
-
-        final Node start = new Node(command.node);
-
-        if (!graph.containsVertex(start)) {
+        final Optional<List<String>> nodes = GraphOps.closerThan(graph, command.weight, command.node);
+        if (!nodes.isPresent()) {
             return NODE_NOT_FOUND;
         }
-
-        final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
-
-        final Predicate<Node> keepNode =
-                node -> {
-                    if (node.equals(start)) {
-                        return false;
-                    }
-                    final Number distance = shortestPath.getDistance(start, node);
-                    if (distance == null) {
-                        return false;
-                    }
-                    final int weight = distance.intValue();
-                    return weight < command.weight;
-                };
-
-        final VertexPredicateFilter<Node, Edge> nodeFilter = new VertexPredicateFilter<>(keepNode);
-        final Graph<Node, Edge> closerThan = nodeFilter.transform(graph);
-
-        final List<String> names = closerThan.getVertices().stream().map(n -> n.name).collect(toList());
-
-        return Messages.closerThan(names);
+        return Messages.closerThan(nodes.get());
     }
 }
