@@ -13,7 +13,6 @@ import java.util.List;
 
 import static com.collibra.codingchallenge.Messages.*;
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
-import static edu.uci.ics.jung.graph.util.EdgeType.DIRECTED;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
@@ -52,19 +51,10 @@ public final class GraphManager {
 
     private String handleAddEdge(final AddEdge command) {
 
-        final Node from = new Node(command.from);
-        final Node to = new Node(command.to);
+        final boolean added = GraphOps.addEdge(graph, command.from, command.to, command.weight);
 
-        if (!graph.containsVertex(from) || !graph.containsVertex(to)) {
+        if (!added) {
             return NODE_NOT_FOUND;
-        }
-
-        final Edge edge = new Edge(command.weight, command.from, command.to);
-
-        if (!graph.containsEdge(edge)) {
-            graph.addEdge(edge, from, to, DIRECTED);
-        } else {
-            LOGGER.warn("Edge already exists - {}", edge);
         }
 
         return EDGE_ADDED;
