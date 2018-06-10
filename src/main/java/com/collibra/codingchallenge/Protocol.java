@@ -19,8 +19,6 @@ final class Protocol implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
-    private static final Object SEPARATOR = System.getProperty("line.separator");
-
     private final Socket socket;
     private final UUID sessionID;
 
@@ -28,7 +26,6 @@ final class Protocol implements AutoCloseable {
     private BufferedWriter server;
 
     private long started;
-
     private String name;
 
     void initialize() throws IOException {
@@ -37,17 +34,11 @@ final class Protocol implements AutoCloseable {
         started = System.currentTimeMillis();
     }
 
-    @Override
-    public void close() {
-        IOUtils.closeQuietly(client);
-        IOUtils.closeQuietly(server);
-    }
-
     void exchangeFormalities() throws IOException {
 
         final String firstMessage = format(SERVER_FIRST_MESSAGE, sessionID);
         LOGGER.info("Server first message is '{}'", firstMessage);
-        sendToClient(firstMessage);
+        sendServerMessage(firstMessage);
 
         final String clientResponse = client.readLine();
         LOGGER.info("Client response was '{}'", clientResponse);
@@ -60,23 +51,13 @@ final class Protocol implements AutoCloseable {
 
         final String serverResponse = format(SERVER_RESPONSE, name);
         LOGGER.info("Server response is '{}'", serverResponse);
-        sendToClient(serverResponse);
-    }
-
-    void seeOff() throws IOException {
-
-        final long finished = System.currentTimeMillis();
-        final long duration = finished - started;
-
-        final String message = format(SERVER_FAREWELL, name, duration);
-        LOGGER.info("Server farewell is '{}'", message);
-        sendToClient(message);
+        sendServerMessage(serverResponse);
     }
 
     void notSupportedCommand() throws IOException {
         final String message = SERVER_NOT_SUPPORTED_COMMAND;
         LOGGER.info("Server 'not supported command' message is '{}'", message);
-        sendToClient(message);
+        sendServerMessage(message);
     }
 
     Iterable<String> requests() {
@@ -105,11 +86,33 @@ final class Protocol implements AutoCloseable {
 
     void respond(final String response) throws IOException {
         LOGGER.debug("Server response is '{}'", response);
-        sendToClient(response);
+        sendServerMessage(response);
     }
 
+    private void seeOff() throws IOException {
 
-    private void sendToClient(final String message) throws IOException {
+        final long finished = System.currentTimeMillis();
+        final long duration = finished - started;
+
+        final String farewell = format(SERVER_FAREWELL, name, duration);
+        LOGGER.info("Server farewell is '{}'", farewell);
+        sendServerMessage(farewell);
+    }
+
+    @Override
+    public void close() {
+        try {
+            seeOff();
+        } catch (final IOException e) {
+            LOGGER.error("Error while seeing off the client - {}", e.getMessage());
+        }
+        IOUtils.closeQuietly(client);
+        IOUtils.closeQuietly(server);
+    }
+
+    private static final Object SEPARATOR = System.getProperty("line.separator");
+
+    private void sendServerMessage(final String message) throws IOException {
         server.write(message + SEPARATOR);
         server.flush();
     }

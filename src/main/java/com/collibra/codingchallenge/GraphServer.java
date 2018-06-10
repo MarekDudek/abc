@@ -60,10 +60,10 @@ public final class GraphServer {
 
         @Override
         public Void call() {
+
             LOGGER.info("Client {} on {} started", sessionID, socket);
-            Protocol protocol = null; // FIXME: use try-with-resources to simplify
-            try {
-                protocol = new Protocol(socket, sessionID);
+
+            try (final Protocol protocol = new Protocol(socket, sessionID)) {
                 protocol.initialize();
                 protocol.exchangeFormalities();
                 for (final String request : protocol.requests()) {
@@ -76,17 +76,9 @@ public final class GraphServer {
                     }
                 }
             } catch (final IOException e) {
-                LOGGER.error("Client {} on {} failed with message '{}'", sessionID, socket, e.getMessage());
-            } finally {
-                if (protocol != null) {
-                    try {
-                        protocol.seeOff();
-                    } catch (final IOException e) {
-                        LOGGER.error("Error while closing protocol: {}", e.getMessage());
-                    }
-                    protocol.close();
-                }
+                LOGGER.error("Error while executing protocol - {}", e.getMessage());
             }
+
             LOGGER.info("Client {} on {} finished", sessionID, socket);
             return null;
         }
