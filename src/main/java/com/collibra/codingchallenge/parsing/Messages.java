@@ -47,8 +47,11 @@ public final class Messages {
     public static final String NODE_NOT_FOUND = "ERROR: NODE NOT FOUND";
     public static final String NODE_ALREADY_EXISTS = "ERROR: NODE ALREADY EXISTS";
 
-    public static final String SHORTEST_PATH = "%d";
+    private static final String SHORTEST_PATH = "%d";
 
+    public static String shortestPath(final Integer weight) {
+        return String.format(SHORTEST_PATH, weight);
+    }
 
     public static String closerThan(final List<String> names) {
         return names.stream().sorted(

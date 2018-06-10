@@ -12,9 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 
-import static com.collibra.codingchallenge.parsing.Messages.*;
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
-import static java.lang.String.format;
+import static com.collibra.codingchallenge.parsing.Messages.*;
 
 final class GraphManager {
 
@@ -75,7 +74,7 @@ final class GraphManager {
         if (!weight.isPresent()) {
             return NODE_NOT_FOUND;
         }
-        return format(SHORTEST_PATH, weight.get());
+        return Messages.shortestPath(weight.get());
     }
 
     private String handleCloserThan(final CloserThan command) {
