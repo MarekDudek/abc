@@ -1,18 +1,21 @@
 
 # Collibra coding challenge
 
-This is a standard Maven project. In order to run it first build
+## The code
+
+The code is in ```coding-challenge.zip``` archive, full Maven project.
+
+## Full built package
+
+The full built package is ```coding-challenge-1.0.0.jar```
+
+## How to execute
+
+Run 
 ```
-mvn clean install
-```    
-and then either
+    java -jar path/to/coding-challenge-1.0.0.jar
 ```
-    java -jar ./target/coding-challenge-1.0.0.jar
-```
-or
-```
-    mvn exec:java
-```
+
 ## Expected results
 
 On my machine all six phases pass. The test takes almost exactly one minute to finish.
@@ -30,5 +33,5 @@ You can configure logging with system properties, as described
 for example changing log level looks like this:
 
 ```
-java -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -jar ./target/coding-challenge-1.0.0.jar
+java -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -jar path/to/coding-challenge-1.0.0.jar
 ```
