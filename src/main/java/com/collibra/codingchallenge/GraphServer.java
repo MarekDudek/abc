@@ -3,7 +3,6 @@ package com.collibra.codingchallenge;
 import com.collibra.codingchallenge.commands.GraphCommand;
 import com.collibra.codingchallenge.graphs.GraphCommandParser;
 import com.collibra.codingchallenge.graphs.GraphManager;
-import com.collibra.codingchallenge.graphs.JungGraphManager;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,7 @@ public final class GraphServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
 
-    private final GraphManager graphManager = new JungGraphManager();
+    private final GraphManager graphManager = new GraphManager();
 
     public static void main(final String[] ignored) {
         LOGGER.info("Starting Collibra Graph Server");
