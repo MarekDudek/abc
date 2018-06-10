@@ -34,11 +34,10 @@ public final class GraphOps {
 
     public static boolean addNode(final Graph<Node, Edge> graph, final String node) {
 
-        final Node n = node(node);
-        final boolean added = graph.addVertex(n);
+        final boolean added = graph.addVertex(node(node));
 
         if (!added) {
-            LOGGER.info("Node not added - {}", n);
+            LOGGER.info("Node not added - {}", node);
         }
 
         return added;
@@ -46,11 +45,10 @@ public final class GraphOps {
 
     public static boolean removeNode(final Graph<Node, Edge> graph, final String node) {
 
-        final Node n = node(node);
-        final boolean removed = graph.removeVertex(n);
+        final boolean removed = graph.removeVertex(node(node));
 
         if (!removed) {
-            LOGGER.info("Node not removed - {}", n);
+            LOGGER.info("Node not removed - {}", node);
         }
 
         return removed;
@@ -59,16 +57,11 @@ public final class GraphOps {
 
     public static boolean addEdge(final Graph<Node, Edge> graph, final int weight, final String start, final String end) {
 
-        final Node st = node(start);
-
-        if (!graph.containsVertex(st)) {
+        if (!containsNode(graph, start)) {
             LOGGER.info("Starting node not found - '{}'", start);
             return false;
         }
-
-        final Node en = node(end);
-
-        if (!graph.containsVertex(en)) {
+        if (!containsNode(graph, end)) {
             LOGGER.info("Ending node not found - '{}'", end);
             return false;
         }
@@ -78,7 +71,7 @@ public final class GraphOps {
         if (graph.containsEdge(e)) {
             LOGGER.info("Edge already exists - {}", e);
         } else {
-            graph.addEdge(e, st, en, DIRECTED);
+            graph.addEdge(e, node(start), node(end), DIRECTED);
         }
 
         return true;
@@ -86,16 +79,11 @@ public final class GraphOps {
 
     public static boolean removeEdge(final Graph<Node, Edge> graph, final String start, final String end) {
 
-        final Node st = node(start);
-
-        if (!graph.containsVertex(st)) {
+        if (!containsNode(graph, start)) {
             LOGGER.info("Starting node not found - '{}'", start);
             return false;
         }
-
-        final Node en = node(end);
-
-        if (!graph.containsVertex(en)) {
+        if (!containsNode(graph, end)) {
             LOGGER.info("Ending node not found - '{}'", end);
             return false;
         }
@@ -105,7 +93,7 @@ public final class GraphOps {
         ).collect(toList());
 
         if (edges.isEmpty()) {
-            LOGGER.info("No edge between {} and {} end remove", st, en);
+            LOGGER.info("No edge between {} and {} end remove", start, end);
         }
 
         for (final Edge edge : edges) {
@@ -122,24 +110,19 @@ public final class GraphOps {
 
     public static Optional<Integer> shortestPath(final Graph<Node, Edge> graph, final String start, final String end) {
 
-        final Node st = node(start);
-
-        if (!graph.containsVertex(st)) {
+        if (!containsNode(graph, start)) {
             LOGGER.info("Starting node not found - '{}'", start);
             return Optional.empty();
         }
-
-        final Node en = node(end);
-
-        if (!graph.containsVertex(en)) {
+        if (!containsNode(graph, end)) {
             LOGGER.info("Ending node not found - '{}'", end);
             return Optional.empty();
         }
 
         final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
-        final Number distance = shortestPath.getDistance(st, en);
-        final int weight = nodesConnected(distance) ? distance.intValue() : Integer.MAX_VALUE;
+        final Number distance = shortestPath.getDistance(node(start), node(end));
 
+        final int weight = nodesConnected(distance) ? distance.intValue() : Integer.MAX_VALUE;
         return Optional.of(weight);
     }
 
@@ -174,5 +157,9 @@ public final class GraphOps {
 
     private static boolean nodesConnected(final Number distance) {
         return distance != null;
+    }
+
+    static boolean containsNode(final Graph<Node, Edge> graph, final String node) {
+        return graph.containsVertex(node(node));
     }
 }

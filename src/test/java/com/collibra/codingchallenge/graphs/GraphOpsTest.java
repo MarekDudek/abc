@@ -20,12 +20,12 @@ public final class GraphOpsTest {
         // when
         final Graph<Node, Edge> graph = graph();
         // then
-        assertThat(graph.containsVertex(node(id)), is(false));
+        assertThat(containsNode(graph, id), is(false));
         // when
         final boolean added = addNode(graph, id);
         // then
         assertThat(added, is(true));
-        assertThat(graph.containsVertex(node(id)), is(true));
+        assertThat(containsNode(graph, id), is(true));
         // when
         final boolean addedAgain = addNode(graph, id);
         // then
@@ -34,7 +34,7 @@ public final class GraphOpsTest {
         final boolean removed = removeNode(graph, id);
         // then
         assertThat(removed, is(true));
-        assertThat(graph.containsVertex(node(id)), is(false));
+        assertThat(containsNode(graph, id), is(false));
         // when
         final boolean removedAgain = removeNode(graph, id);
         // then
@@ -81,13 +81,13 @@ public final class GraphOpsTest {
         // then
         assertThat(startRemoved, is(true));
         assertThat(graph.containsEdge(edge(weight, start, end)), is(false));
-        assertThat(graph.containsVertex(node(start)), is(false));
-        assertThat(graph.containsVertex(node(end)), is(true));
+        assertThat(containsNode(graph, start), is(false));
+        assertThat(containsNode(graph, end), is(true));
         // when
         final boolean endRemoved = removeNode(graph, end);
         // then
         assertThat(endRemoved, is(true));
-        assertThat(graph.containsVertex(node(end)), is(false));
+        assertThat(containsNode(graph, end), is(false));
     }
 
     @Test
