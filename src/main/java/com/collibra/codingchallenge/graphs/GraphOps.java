@@ -18,6 +18,7 @@ public final class GraphOps {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphOps.class);
 
+
     public static Graph<Node, Edge> createGraph() {
         return new DirectedSparseMultigraph<>();
     }
@@ -145,7 +146,7 @@ public final class GraphOps {
 
         final DijkstraShortestPath<Node, Edge> shortestPath = new DijkstraShortestPath<>(graph, e -> e.weight);
 
-        final Predicate<Node> keepNode =
+        final Predicate<Node> closerThanThreshold =
                 n -> {
                     if (n.equals(f)) {
                         return false;
@@ -155,10 +156,10 @@ public final class GraphOps {
                     return weight < threshold;
                 };
 
-        final VertexPredicateFilter<Node, Edge> nodeFilter = new VertexPredicateFilter<>(keepNode);
-        final Graph<Node, Edge> closerThan = nodeFilter.transform(graph);
+        final VertexPredicateFilter<Node, Edge> nodeFilter = new VertexPredicateFilter<>(closerThanThreshold);
+        final Graph<Node, Edge> closerNodes = nodeFilter.transform(graph);
 
-        final List<String> names = closerThan.getVertices().stream().map(n -> n.name).collect(toList());
+        final List<String> names = closerNodes.getVertices().stream().map(n -> n.name).collect(toList());
 
         return Optional.of(names);
     }

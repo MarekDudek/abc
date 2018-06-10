@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.collibra.codingchallenge.commands.GraphCommand.match;
+import static com.collibra.codingchallenge.graphs.GraphOps.*;
+import static com.collibra.codingchallenge.graphs.GraphOps.closerThan;
+import static com.collibra.codingchallenge.graphs.GraphOps.shortestPath;
 import static com.collibra.codingchallenge.parsing.Messages.*;
 
 final class GraphManager {
@@ -37,7 +40,7 @@ final class GraphManager {
     }
 
     private String handleAddNode(final AddNode command) {
-        final boolean added = GraphOps.addNode(graph, command.node);
+        final boolean added = addNode(graph, command.node);
         if (!added) {
             return NODE_ALREADY_EXISTS;
         }
@@ -45,7 +48,7 @@ final class GraphManager {
     }
 
     private String handleAddEdge(final AddEdge command) {
-        final boolean added = GraphOps.addEdge(graph, command.from, command.to, command.weight);
+        final boolean added = addEdge(graph, command.from, command.to, command.weight);
         if (!added) {
             return NODE_NOT_FOUND;
         }
@@ -53,7 +56,7 @@ final class GraphManager {
     }
 
     private String handleRemoveNode(final RemoveNode command) {
-        final boolean removed = GraphOps.removeNode(graph, command.node);
+        final boolean removed = removeNode(graph, command.node);
         if (!removed) {
             return NODE_NOT_FOUND;
         }
@@ -61,7 +64,7 @@ final class GraphManager {
     }
 
     private String handleRemoveEdge(final RemoveEdge command) {
-        final boolean removed = GraphOps.removeEdge(graph, command.from, command.to);
+        final boolean removed = removeEdge(graph, command.from, command.to);
         if (!removed) {
             return NODE_NOT_FOUND;
         }
@@ -70,7 +73,7 @@ final class GraphManager {
     }
 
     private String handleShortestPath(final ShortestPath command) {
-        final Optional<Integer> weight = GraphOps.shortestPath(graph, command.from, command.to);
+        final Optional<Integer> weight = shortestPath(graph, command.from, command.to);
         if (!weight.isPresent()) {
             return NODE_NOT_FOUND;
         }
@@ -78,7 +81,7 @@ final class GraphManager {
     }
 
     private String handleCloserThan(final CloserThan command) {
-        final Optional<List<String>> nodes = GraphOps.closerThan(graph, command.weight, command.node);
+        final Optional<List<String>> nodes = closerThan(graph, command.weight, command.node);
         if (!nodes.isPresent()) {
             return NODE_NOT_FOUND;
         }
