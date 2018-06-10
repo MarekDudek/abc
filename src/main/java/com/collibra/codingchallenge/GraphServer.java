@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,8 +18,6 @@ import static com.collibra.codingchallenge.CollibraConstants.CLIENT_TIMEOUT;
 import static com.collibra.codingchallenge.CollibraConstants.COLLIBRA_PORT;
 
 public final class GraphServer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
 
     private final GraphManager graphManager = new GraphManager();
 
@@ -38,7 +35,7 @@ public final class GraphServer {
                     LOGGER.info("Waiting for clients ...");
                     final Socket client = server.accept();
                     client.setSoTimeout(timeout);
-                    final Callable<Void> task = new ClientHandler(client);
+                    final Callable<Boolean> task = new ClientHandler(client);
                     service.submit(task);
                 } catch (final IOException e) {
                     LOGGER.error("Error while handling client - {}", e.getMessage());
@@ -51,19 +48,13 @@ public final class GraphServer {
     }
 
     @RequiredArgsConstructor
-    private class ClientHandler implements Callable<Void> {
-
-        private final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
+    private class ClientHandler implements Callable<Boolean> {
 
         private final Socket socket;
-        private final UUID sessionID = UUID.randomUUID(); // FIXME: move to protocol
 
         @Override
-        public Void call() {
-
-            LOGGER.info("Client {} on {} started", sessionID, socket);
-
-            try (final Protocol protocol = new Protocol(socket, sessionID)) {
+        public Boolean call() {
+            try (final Protocol protocol = new Protocol(socket)) {
                 protocol.initialize();
                 protocol.exchangeFormalities();
                 for (final String request : protocol.requests()) {
@@ -77,10 +68,13 @@ public final class GraphServer {
                 }
             } catch (final IOException e) {
                 LOGGER.error("Error while executing protocol - {}", e.getMessage());
+                return false;
             }
-
-            LOGGER.info("Client {} on {} finished", sessionID, socket);
-            return null;
+            return true;
         }
+
+        private final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphServer.class);
 }

@@ -19,8 +19,8 @@ final class Protocol implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
+    private final UUID sessionID = UUID.randomUUID();
     private final Socket socket;
-    private final UUID sessionID;
 
     private BufferedReader client;
     private BufferedWriter server;
@@ -29,6 +29,7 @@ final class Protocol implements AutoCloseable {
     private String name;
 
     void initialize() throws IOException {
+        LOGGER.info("Client {} on {} started", sessionID, socket);
         client = new BufferedReader(new InputStreamReader(new DataInputStream(socket.getInputStream())));
         server = new BufferedWriter(new OutputStreamWriter(new DataOutputStream(socket.getOutputStream())));
         started = System.currentTimeMillis();
@@ -108,6 +109,7 @@ final class Protocol implements AutoCloseable {
         }
         IOUtils.closeQuietly(client);
         IOUtils.closeQuietly(server);
+        LOGGER.info("Client {} on {} finished", sessionID, socket);
     }
 
     private static final Object SEPARATOR = System.getProperty("line.separator");
