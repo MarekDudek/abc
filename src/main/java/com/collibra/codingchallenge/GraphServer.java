@@ -55,11 +55,11 @@ public final class GraphServer {
     @RequiredArgsConstructor
     private class ClientHandler implements Callable<Boolean> {
 
-        private final Socket socket;
+        private final Socket client;
 
         @Override
         public Boolean call() {
-            try (final Protocol protocol = new Protocol(socket)) {
+            try (final Protocol protocol = new Protocol(client)) {
                 protocol.initialize();
                 protocol.exchangeFormalities();
                 for (final String request : protocol.requests()) {
@@ -72,7 +72,7 @@ public final class GraphServer {
                     }
                 }
             } catch (final IOException e) {
-                LOGGER.error("Error while executing protocol - {}", e.getMessage());
+                LOGGER.error("Error while executing protocol on client {} - {}", client, e.getMessage());
                 return false;
             }
             return true;
@@ -80,9 +80,9 @@ public final class GraphServer {
     }
 
     @RequiredArgsConstructor
-    private class ResultReporter implements Runnable {
+    private static class ResultReporter implements Runnable {
 
-        final ListenableFuture<Boolean> result;
+        private final ListenableFuture<Boolean> result;
 
         @Override
         public void run() {

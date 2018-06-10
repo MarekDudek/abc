@@ -46,7 +46,7 @@ final class Protocol implements AutoCloseable {
 
         name = Messages.nodeName(clientResponse).orElseGet(
                 () -> {
-                    LOGGER.warn("Unable to parse client's name");
+                    LOGGER.error("Unable to parse client's name in session {}", sessionID);
                     return "anonymous";
                 });
 
@@ -62,7 +62,6 @@ final class Protocol implements AutoCloseable {
     }
 
     Iterable<String> requests() {
-
         return () -> new Iterator<String>() {
 
             private String request;
@@ -73,7 +72,8 @@ final class Protocol implements AutoCloseable {
                     request = client.readLine();
                     LOGGER.debug("Client request was '{}'", request);
                     return request != null && !Messages.clientEndedSession(request);
-                } catch (final IOException ignored) {
+                } catch (final IOException e) {
+                    LOGGER.error("Error while reading from client in session {} - {}", sessionID, e.getMessage());
                     return false;
                 }
             }
@@ -105,7 +105,7 @@ final class Protocol implements AutoCloseable {
         try {
             seeOff();
         } catch (final IOException e) {
-            LOGGER.error("Error while seeing off the client - {}", e.getMessage());
+            LOGGER.error("Error while seeing off the client in session {} - {}", sessionID, e.getMessage());
         }
         IOUtils.closeQuietly(client);
         IOUtils.closeQuietly(server);
