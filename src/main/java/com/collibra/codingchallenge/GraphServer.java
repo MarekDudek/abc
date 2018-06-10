@@ -23,23 +23,22 @@ public final class GraphServer {
 
     public static void main(final String[] ignored) {
         LOGGER.info("Starting Collibra Graph Server");
-        try {
-            new GraphServer().start(COLLIBRA_PORT, CLIENT_TIMEOUT);
-        } catch (final IOException e) {
-            LOGGER.error("I/O error: " + e.getMessage());
-            System.exit(1);
-        }
+        new GraphServer().start(COLLIBRA_PORT, CLIENT_TIMEOUT);
         LOGGER.info("Collibra Graph Server finished"); // FIXME: handle graceful closing
     }
 
-    private void start(final int port, final int timeout) throws IOException {
-        final ServerSocket server = new ServerSocket(port);
-        while (true) { // FIXME: handle closing of server
-            LOGGER.info("Waiting for clients ...");
-            final Socket client = server.accept();
-            client.setSoTimeout(timeout);
-            final ClientHandler handler = new ClientHandler(client);
-            new Thread(handler).start();
+    private void start(final int port, final int timeout) {
+        try (final ServerSocket s = new ServerSocket(port)) {
+            while (true) {
+                LOGGER.info("Waiting for clients ...");
+                final Socket c = s.accept();
+                c.setSoTimeout(timeout);
+                final ClientHandler h = new ClientHandler(c);
+                new Thread(h).start();
+            }
+        } catch (final IOException e) {
+            LOGGER.error("Could not start the server - {}", e.getMessage());
+            System.exit(1);
         }
     }
 

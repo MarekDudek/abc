@@ -13,6 +13,9 @@ or
 ```
     mvn exec:java
 ```
+## Expected results
+
+On my machine all six phases pass. The test takes almost exactly one minute to finish.
  
 ## Notes
 
